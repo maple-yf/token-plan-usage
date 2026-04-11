@@ -7,8 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		15305BD20CAA9E25C098BF49 /* UsageDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648E8CF65087F37C78E7F49B /* UsageDistribution.swift */; };
+		2D8ACACF2E9C3AC8FC9DF6A2 /* APIStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */; };
+		406B5FE071FB7FBD3D2C60AC /* UsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */; };
+		598CA27FCC600281B634AABC /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */; };
 		63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */; };
 		64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3372058EA405BF4BC3C89CF2 /* ContentView.swift */; };
+		7CC20C7526668AB8845FD9DC /* UsageSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */; };
 		87616385E669B30B49B3A44C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 882016BD405BD6642F62B928 /* Assets.xcassets */; };
 		89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */; };
 /* End PBXBuildFile section */
@@ -24,10 +29,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		648E8CF65087F37C78E7F49B /* UsageDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDistribution.swift; sourceTree = "<group>"; };
 		882016BD405BD6642F62B928 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshotTests.swift; sourceTree = "<group>"; };
 		9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageTests.swift; sourceTree = "<group>"; };
+		B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshot.swift; sourceTree = "<group>"; };
+		D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStatus.swift; sourceTree = "<group>"; };
 		D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TokenPlanUsageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsage.entitlements; sourceTree = "<group>"; };
 		F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageApp.swift; sourceTree = "<group>"; };
@@ -96,6 +106,10 @@
 		A2D2BE332EEAEE93313C98C4 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */,
+				2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */,
+				648E8CF65087F37C78E7F49B /* UsageDistribution.swift */,
+				B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -155,6 +169,7 @@
 		EDF71F3FB2E20B84D058DD5F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -252,6 +267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */,
+				7CC20C7526668AB8845FD9DC /* UsageSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,8 +275,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D8ACACF2E9C3AC8FC9DF6A2 /* APIStatus.swift in Sources */,
 				64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */,
+				598CA27FCC600281B634AABC /* ProviderConfig.swift in Sources */,
 				89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */,
+				15305BD20CAA9E25C098BF49 /* UsageDistribution.swift in Sources */,
+				406B5FE071FB7FBD3D2C60AC /* UsageSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,6 +470,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -466,6 +487,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
