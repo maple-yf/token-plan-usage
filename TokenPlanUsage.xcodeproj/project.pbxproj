@@ -19,6 +19,8 @@
 		89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */; };
 		92FBCDBEBAA3FC84DEADE64A /* MockTokenProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */; };
 		BB60A462D20B67F16051DE8B /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */; };
+		BD1B0A83D4D5A49EBEC9836E /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0C4F50F1D053067224EC39 /* GLMProvider.swift */; };
+		C09199DBDDE13D7C773B22A1 /* GLMProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */; };
 		EEA57DF3E997376FFF076F0D /* MiniMaxProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,10 +35,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProviderTests.swift; sourceTree = "<group>"; };
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
+		3F0C4F50F1D053067224EC39 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
 		5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTokenProviderTests.swift; sourceTree = "<group>"; };
 		648E8CF65087F37C78E7F49B /* UsageDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDistribution.swift; sourceTree = "<group>"; };
 		882016BD405BD6642F62B928 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -64,6 +68,7 @@
 		25BD3D670FC7461A9F200198 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				3F0C4F50F1D053067224EC39 /* GLMProvider.swift */,
 				3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */,
 			);
 			path = Providers;
@@ -72,6 +77,7 @@
 		386077059752BBC116298F3D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */,
 				A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */,
 				5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */,
 			);
@@ -278,6 +284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C09199DBDDE13D7C773B22A1 /* GLMProviderTests.swift in Sources */,
 				EEA57DF3E997376FFF076F0D /* MiniMaxProviderTests.swift in Sources */,
 				92FBCDBEBAA3FC84DEADE64A /* MockTokenProviderTests.swift in Sources */,
 				63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */,
@@ -291,6 +298,7 @@
 			files = (
 				2D8ACACF2E9C3AC8FC9DF6A2 /* APIStatus.swift in Sources */,
 				64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */,
+				BD1B0A83D4D5A49EBEC9836E /* GLMProvider.swift in Sources */,
 				BB60A462D20B67F16051DE8B /* MiniMaxProvider.swift in Sources */,
 				598CA27FCC600281B634AABC /* ProviderConfig.swift in Sources */,
 				89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */,
