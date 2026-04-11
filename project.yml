@@ -1,0 +1,50 @@
+name: TokenPlanUsage
+options:
+  bundleIdPrefix: com.tokenplan
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "^16"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  TokenPlanUsage:
+    type: application
+    platform: iOS
+    sources:
+      - TokenPlanUsage
+    settings:
+      base:
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
+        INFOPLIST_KEY_CFBundleDisplayName: "Token Plan Usage"
+        MARKETING_VERSION: "1.0.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsage
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    resources:
+      - path: TokenPlanUsage/Assets.xcassets
+    entitlements:
+      path: TokenPlanUsage/TokenPlanUsage.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+
+  TokenPlanUsageTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - TokenPlanUsageTests
+    dependencies:
+      - target: TokenPlanUsage
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsageTests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/TokenPlanUsage.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TokenPlanUsage"

@@ -1,0 +1,514 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */; };
+		64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3372058EA405BF4BC3C89CF2 /* ContentView.swift */; };
+		87616385E669B30B49B3A44C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 882016BD405BD6642F62B928 /* Assets.xcassets */; };
+		89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DDE0D044ED4CBD79A4CA8393 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE86602E2029B2F85B844326 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D26060D0B85A84F26C8E773B;
+			remoteInfo = TokenPlanUsage;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		882016BD405BD6642F62B928 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageTests.swift; sourceTree = "<group>"; };
+		D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TokenPlanUsageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsage.entitlements; sourceTree = "<group>"; };
+		F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0F56A6329BE1223AB28F3E29 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3372058EA405BF4BC3C89CF2 /* ContentView.swift */,
+				F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		25BD3D670FC7461A9F200198 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		386077059752BBC116298F3D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		3B20B69D2D9E3BBE53C78403 /* TokenPlanUsage */ = {
+			isa = PBXGroup;
+			children = (
+				882016BD405BD6642F62B928 /* Assets.xcassets */,
+				E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */,
+				0F56A6329BE1223AB28F3E29 /* App */,
+				A2D2BE332EEAEE93313C98C4 /* Models */,
+				72FB22E69F32569E46CE4593 /* Services */,
+				8F4A66555AE530002D7C3172 /* ViewModels */,
+				D41DE22267DA2B82D25C5282 /* Views */,
+			);
+			path = TokenPlanUsage;
+			sourceTree = "<group>";
+		};
+		72FB22E69F32569E46CE4593 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				25BD3D670FC7461A9F200198 /* Providers */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		7C04F7488A7FE70019DDE15E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		8F4A66555AE530002D7C3172 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A2D2BE332EEAEE93313C98C4 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		BDA4B5AA097330B53504FAC8 /* TokenPlanUsageTests */ = {
+			isa = PBXGroup;
+			children = (
+				9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */,
+				EDF71F3FB2E20B84D058DD5F /* Models */,
+				386077059752BBC116298F3D /* Services */,
+				7C04F7488A7FE70019DDE15E /* ViewModels */,
+			);
+			path = TokenPlanUsageTests;
+			sourceTree = "<group>";
+		};
+		C273862EFA9335A7FBAAF572 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */,
+				D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C58713969E73F8E90104751F = {
+			isa = PBXGroup;
+			children = (
+				3B20B69D2D9E3BBE53C78403 /* TokenPlanUsage */,
+				BDA4B5AA097330B53504FAC8 /* TokenPlanUsageTests */,
+				C273862EFA9335A7FBAAF572 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C743602D4CA044E1E6B7F0F2 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		D41DE22267DA2B82D25C5282 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E97B337218AFCE30E3CE93EF /* Monitor */,
+				C743602D4CA044E1E6B7F0F2 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E97B337218AFCE30E3CE93EF /* Monitor */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Monitor;
+			sourceTree = "<group>";
+		};
+		EDF71F3FB2E20B84D058DD5F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8F8C55C1B1E00C1CF99F17D8 /* TokenPlanUsageTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7226A01BB24172BF571E03B /* Build configuration list for PBXNativeTarget "TokenPlanUsageTests" */;
+			buildPhases = (
+				3F12EA056B84E4E4AD2A5C06 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				907FAA6CEEB83EC847B25E97 /* PBXTargetDependency */,
+			);
+			name = TokenPlanUsageTests;
+			packageProductDependencies = (
+			);
+			productName = TokenPlanUsageTests;
+			productReference = D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D26060D0B85A84F26C8E773B /* TokenPlanUsage */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD488A304A3EAA3E4755CDC4 /* Build configuration list for PBXNativeTarget "TokenPlanUsage" */;
+			buildPhases = (
+				99B389BFF93B6D9502214CD5 /* Sources */,
+				99CFD749AE818C5D91C4FA3B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TokenPlanUsage;
+			packageProductDependencies = (
+			);
+			productName = TokenPlanUsage;
+			productReference = 3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BE86602E2029B2F85B844326 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = "^16";
+				TargetAttributes = {
+					8F8C55C1B1E00C1CF99F17D8 = {
+						DevelopmentTeam = "";
+					};
+					D26060D0B85A84F26C8E773B = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = E88327032F2441FBA64A6614 /* Build configuration list for PBXProject "TokenPlanUsage" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C58713969E73F8E90104751F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C273862EFA9335A7FBAAF572 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D26060D0B85A84F26C8E773B /* TokenPlanUsage */,
+				8F8C55C1B1E00C1CF99F17D8 /* TokenPlanUsageTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		99CFD749AE818C5D91C4FA3B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				87616385E669B30B49B3A44C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3F12EA056B84E4E4AD2A5C06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99B389BFF93B6D9502214CD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */,
+				89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		907FAA6CEEB83EC847B25E97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D26060D0B85A84F26C8E773B /* TokenPlanUsage */;
+			targetProxy = DDE0D044ED4CBD79A4CA8393 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		19ED614376788FF41FCAE5E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsage;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		788209D207ABA4F34B165930 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		842AC2A6AE8315AB62841A82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsage;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		93D1B305CC4683887A7E3422 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		A89E8ED91A18EE83294C660E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenPlanUsage.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TokenPlanUsage";
+			};
+			name = Debug;
+		};
+		E6C7AFA5BBA2846A1467C39A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenPlanUsage.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TokenPlanUsage";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C7226A01BB24172BF571E03B /* Build configuration list for PBXNativeTarget "TokenPlanUsageTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A89E8ED91A18EE83294C660E /* Debug */,
+				E6C7AFA5BBA2846A1467C39A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E88327032F2441FBA64A6614 /* Build configuration list for PBXProject "TokenPlanUsage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93D1B305CC4683887A7E3422 /* Debug */,
+				788209D207ABA4F34B165930 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD488A304A3EAA3E4755CDC4 /* Build configuration list for PBXNativeTarget "TokenPlanUsage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				19ED614376788FF41FCAE5E5 /* Debug */,
+				842AC2A6AE8315AB62841A82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BE86602E2029B2F85B844326 /* Project object */;
+}
