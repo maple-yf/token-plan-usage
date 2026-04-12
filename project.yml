@@ -49,3 +49,29 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsageTests
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/TokenPlanUsage.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TokenPlanUsage"
+
+  TokenPlanUsageWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TokenPlanUsageWidget
+      - path: TokenPlanUsage/Models
+      - path: TokenPlanUsage/Services/SharedStore.swift
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsageWidget
+        INFOPLIST_KEY_CFBundleDisplayName: "Token Usage Widget"
+        INFOPLIST_KEY_NSExtension: {
+          NSExtensionPointIdentifier: "com.apple.widgetkit-extension"
+        }
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    entitlements:
+      path: TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements
+      properties:
+        com.apple.security.app-sandbox: true

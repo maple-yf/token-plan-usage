@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		033659396E33B8C8D0E3036C /* UsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */; };
+		0D06155FD05C529AAE807916 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23192A5F3BA94C6CB58EE9AE /* WidgetKit.framework */; };
 		15305BD20CAA9E25C098BF49 /* UsageDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648E8CF65087F37C78E7F49B /* UsageDistribution.swift */; };
 		1BCDA792F359CF6C84979685 /* TokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB05137FA96DC41F6E9696B2 /* TokenProvider.swift */; };
 		2D8ACACF2E9C3AC8FC9DF6A2 /* APIStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */; };
+		2E285A6EF1ED732029669D1F /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754A5E409DAC12F47247B5A1 /* SharedStore.swift */; };
+		329F76B122B5497AD8D35CF4 /* TokenPlanUsageWidgetEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */; };
 		3861703F806CF95C870126E7 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754A5E409DAC12F47247B5A1 /* SharedStore.swift */; };
 		406B5FE071FB7FBD3D2C60AC /* UsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */; };
 		573EC7D6E33C2BB264AE8997 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2262FF4DAC175BB21F4D76BB /* MainTabView.swift */; };
@@ -18,15 +22,20 @@
 		63093480B2EA1C3A5692BFC5 /* SharedStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49872554EEB076DC8F98053 /* SharedStoreTests.swift */; };
 		63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */; };
 		64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3372058EA405BF4BC3C89CF2 /* ContentView.swift */; };
+		68DAE360CC5A1B2FCCEB8E6D /* TokenPlanUsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */; };
 		727EF775479F3909759E2AFA /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */; };
+		74EB139DE06647BDF358401A /* UsageDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648E8CF65087F37C78E7F49B /* UsageDistribution.swift */; };
 		7CC20C7526668AB8845FD9DC /* UsageSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */; };
+		7E8A55396C7DA24676CC46EE /* APIStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */; };
 		7E8DD4CFA9A48748D8D52827 /* RefreshManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27322AE0C758F10E8C2A168 /* RefreshManager.swift */; };
 		8333B8CD6B5B8302CD80F6A8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49D595AFA4A027D5B0EBB07 /* SettingsView.swift */; };
 		87616385E669B30B49B3A44C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 882016BD405BD6642F62B928 /* Assets.xcassets */; };
 		89A4B427EF80EF96A589FC9A /* TokenPlanUsageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */; };
 		8BC9FAB15D8DFF779BB8865F /* ProviderConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1092D257E40A8BCDC3D5ADF /* ProviderConfigView.swift */; };
+		8F452821CD75B27B8BE47107 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20287B47B6D7FF7203A903E /* SwiftUI.framework */; };
 		9130CFD6E9C989791BFA3E98 /* UsageTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8110157B74E5CC8B44374347 /* UsageTrendChart.swift */; };
 		92FBCDBEBAA3FC84DEADE64A /* MockTokenProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */; };
+		956F10A8BD9315691FEB155D /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */; };
 		B1A1CCD59D9E58D12E2DFA30 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874DC9C83DFA8A3BAE409B56 /* KeychainService.swift */; };
 		BB60A462D20B67F16051DE8B /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */; };
 		BD1B0A83D4D5A49EBEC9836E /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0C4F50F1D053067224EC39 /* GLMProvider.swift */; };
@@ -53,15 +62,19 @@
 
 /* Begin PBXFileReference section */
 		122DE4AACB55470317939C26 /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
+		16DB17BE0245753E27416C4C /* TokenPlanUsageWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsageWidget.entitlements; sourceTree = "<group>"; };
 		17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProviderTests.swift; sourceTree = "<group>"; };
 		2262FF4DAC175BB21F4D76BB /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		23192A5F3BA94C6CB58EE9AE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		2856DE82D16E4064858728D6 /* MonitorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorViewModel.swift; sourceTree = "<group>"; };
 		2A15F503173370A66249088B /* RingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingProgressView.swift; sourceTree = "<group>"; };
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidgetEntryView.swift; sourceTree = "<group>"; };
 		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 		3F0C4F50F1D053067224EC39 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
+		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		49EC521B20E0E190FF2645A0 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTokenProviderTests.swift; sourceTree = "<group>"; };
@@ -75,6 +88,7 @@
 		8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshotTests.swift; sourceTree = "<group>"; };
 		9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageTests.swift; sourceTree = "<group>"; };
 		A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProviderTests.swift; sourceTree = "<group>"; };
+		A20287B47B6D7FF7203A903E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A49D595AFA4A027D5B0EBB07 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshot.swift; sourceTree = "<group>"; };
 		C27322AE0C758F10E8C2A168 /* RefreshManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshManager.swift; sourceTree = "<group>"; };
@@ -87,7 +101,20 @@
 		DB05137FA96DC41F6E9696B2 /* TokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenProvider.swift; sourceTree = "<group>"; };
 		E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsage.entitlements; sourceTree = "<group>"; };
 		F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageApp.swift; sourceTree = "<group>"; };
+		F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2EF27642FD9E9CE3976383AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D06155FD05C529AAE807916 /* WidgetKit.framework in Frameworks */,
+				8F452821CD75B27B8BE47107 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0F56A6329BE1223AB28F3E29 /* App */ = {
@@ -132,6 +159,15 @@
 				D41DE22267DA2B82D25C5282 /* Views */,
 			);
 			path = TokenPlanUsage;
+			sourceTree = "<group>";
+		};
+		3D6C03BA0BD56552DBB7D203 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A20287B47B6D7FF7203A903E /* SwiftUI.framework */,
+				23192A5F3BA94C6CB58EE9AE /* WidgetKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		6D645D2B3372387508F1DE42 /* Common */ = {
@@ -198,6 +234,7 @@
 			children = (
 				3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */,
 				D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */,
+				445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -207,6 +244,8 @@
 			children = (
 				3B20B69D2D9E3BBE53C78403 /* TokenPlanUsage */,
 				BDA4B5AA097330B53504FAC8 /* TokenPlanUsageTests */,
+				D99FEDCE66B7B0578922D0BC /* TokenPlanUsageWidget */,
+				3D6C03BA0BD56552DBB7D203 /* Frameworks */,
 				C273862EFA9335A7FBAAF572 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -229,6 +268,16 @@
 				C743602D4CA044E1E6B7F0F2 /* Settings */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		D99FEDCE66B7B0578922D0BC /* TokenPlanUsageWidget */ = {
+			isa = PBXGroup;
+			children = (
+				16DB17BE0245753E27416C4C /* TokenPlanUsageWidget.entitlements */,
+				F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */,
+				3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */,
+			);
+			path = TokenPlanUsageWidget;
 			sourceTree = "<group>";
 		};
 		E97B337218AFCE30E3CE93EF /* Monitor */ = {
@@ -290,6 +339,24 @@
 			productReference = 3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E2DC38F74E6FEF2BBCDE3DD8 /* TokenPlanUsageWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0E3BEDA92C9848B5F71FE88 /* Build configuration list for PBXNativeTarget "TokenPlanUsageWidget" */;
+			buildPhases = (
+				0289C1130166FB8EE316BCF3 /* Sources */,
+				2EF27642FD9E9CE3976383AE /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TokenPlanUsageWidget;
+			packageProductDependencies = (
+			);
+			productName = TokenPlanUsageWidget;
+			productReference = 445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -303,6 +370,9 @@
 						DevelopmentTeam = "";
 					};
 					D26060D0B85A84F26C8E773B = {
+						DevelopmentTeam = "";
+					};
+					E2DC38F74E6FEF2BBCDE3DD8 = {
 						DevelopmentTeam = "";
 					};
 				};
@@ -323,6 +393,7 @@
 			targets = (
 				D26060D0B85A84F26C8E773B /* TokenPlanUsage */,
 				8F8C55C1B1E00C1CF99F17D8 /* TokenPlanUsageTests */,
+				E2DC38F74E6FEF2BBCDE3DD8 /* TokenPlanUsageWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -339,6 +410,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0289C1130166FB8EE316BCF3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E8A55396C7DA24676CC46EE /* APIStatus.swift in Sources */,
+				956F10A8BD9315691FEB155D /* ProviderConfig.swift in Sources */,
+				2E285A6EF1ED732029669D1F /* SharedStore.swift in Sources */,
+				68DAE360CC5A1B2FCCEB8E6D /* TokenPlanUsageWidget.swift in Sources */,
+				329F76B122B5497AD8D35CF4 /* TokenPlanUsageWidgetEntryView.swift in Sources */,
+				74EB139DE06647BDF358401A /* UsageDistribution.swift in Sources */,
+				033659396E33B8C8D0E3036C /* UsageSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F12EA056B84E4E4AD2A5C06 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -419,6 +504,48 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		517E3594614DD421D4132F0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.widgetkit-extension\"]";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6D9C4B0ED435F0C5AA4DF09C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
+				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.widgetkit-extension\"]";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		788209D207ABA4F34B165930 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -608,6 +735,15 @@
 			buildConfigurations = (
 				A89E8ED91A18EE83294C660E /* Debug */,
 				E6C7AFA5BBA2846A1467C39A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E0E3BEDA92C9848B5F71FE88 /* Build configuration list for PBXNativeTarget "TokenPlanUsageWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				517E3594614DD421D4132F0E /* Debug */,
+				6D9C4B0ED435F0C5AA4DF09C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
