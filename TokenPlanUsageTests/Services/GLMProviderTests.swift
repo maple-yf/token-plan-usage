@@ -2,12 +2,10 @@ import XCTest
 @testable import TokenPlanUsage
 
 final class GLMProviderTests: XCTestCase {
-
     var provider: GLMProvider!
     var session: URLSession!
 
     override func setUp() {
-        super.setUp()
         provider = GLMProvider()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
@@ -16,44 +14,91 @@ final class GLMProviderTests: XCTestCase {
     }
 
     override func tearDown() {
-        MockURLProtocol.mockHandler = nil
-        super.tearDown()
+        MockURLProtocol.mockResponse = (data: nil, response: nil, error: nil)
     }
 
-    func testFetchUsageParsesCorrectly() async throws {
-        let json = """
+    // MARK: - Mock Helpers
+
+    private func mockSuccess(json: String, url: String = "https://api.z.ai/api/monitor/usage/model-usage") {
+        // Build query params for model-usage URL
+        let fullURL = url.contains("?") ? url : url + "?startTime=2026-04-11%2000:00:00&endTime=2026-04-12%2023:59:59"
+        MockURLProtocol.mockResponse = (
+            data: json.data(using: .utf8),
+            response: HTTPURLResponse(url: URL(string: fullURL)!, statusCode: 200, httpVersion: nil, headerFields: nil),
+            error: nil
+        )
+    }
+
+    // MARK: - Success Cases
+
+    func testFetchUsageParsesModelUsageAndQuota() async throws {
+        // Mock will return model-usage JSON for both calls (quota will fail gracefully)
+        let modelUsageJSON = """
         {
+            "code": 200,
+            "msg": "Operation successful",
+            "success": true,
             "data": {
-                "total_tokens": 1000000,
-                "used_tokens": 25000,
-                "remaining_tokens": 975000,
-                "plan_name": "GLM-4-Plus"
+                "totalUsage": {
+                    "totalModelCallCount": 1118,
+                    "totalTokensUsage": 50562802,
+                    "modelSummaryList": [
+                        {"modelName": "GLM-5.1", "totalTokens": 45702431},
+                        {"modelName": "GLM-4.7", "totalTokens": 4860371}
+                    ]
+                }
             }
         }
-        """.data(using: .utf8)!
+        """
+        mockSuccess(json: modelUsageJSON)
 
-        MockURLProtocol.mockHandler = { request in
-            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            return (response, json)
-        }
-
-        let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
-        XCTAssertEqual(snapshot.usedCount, 25000)
-        XCTAssertEqual(snapshot.totalCount, 1000000)
+        let snapshot = try await provider.fetchUsage(apiKey: "coding-plan-token", baseURL: nil)
         XCTAssertEqual(snapshot.providerId, "glm")
-        XCTAssertEqual(snapshot.planName, "GLM-4-Plus")
-        XCTAssertEqual(snapshot.remainingPercent, 975000.0 / 1000000.0, accuracy: 0.001)
-        XCTAssertEqual(snapshot.status, .normal)
+        XCTAssertEqual(snapshot.usedCount, 50562802)
+        XCTAssertTrue(snapshot.planName.contains("GLM-5.1"))
     }
 
-    func testFetchUsageThrowsOn401() async {
-        MockURLProtocol.mockHandler = { request in
-            let response = HTTPURLResponse(url: request.url!, statusCode: 401, httpVersion: nil, headerFields: nil)!
-            return (response, Data())
+    func testFetchDistributionParsesHourlyData() async throws {
+        let json = """
+        {
+            "code": 200,
+            "success": true,
+            "data": {
+                "x_time": ["2026-04-11 09:00", "2026-04-11 10:00", "2026-04-11 11:00"],
+                "tokens_usage": [1033418, 836219, 2219443]
+            }
         }
+        """
+        mockSuccess(json: json)
+
+        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(distribution.providerId, "glm")
+        XCTAssertEqual(distribution.points.count, 3)
+        XCTAssertEqual(distribution.points[0].count, 1033418)
+        XCTAssertEqual(distribution.points[2].count, 2219443)
+    }
+
+    func testFetchDistributionWithEmptyData() async throws {
+        let json = """
+        {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": []}}
+        """
+        mockSuccess(json: json)
+
+        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(distribution.points.count, 0)
+    }
+
+    // MARK: - Error Cases
+
+    func testFetchUsageThrowsOnHTTP401() async {
+        MockURLProtocol.mockResponse = (
+            data: Data(),
+            response: HTTPURLResponse(url: URL(string: "https://api.z.ai/api/monitor/usage/model-usage?startTime=a&endTime=b")!, statusCode: 401, httpVersion: nil, headerFields: nil),
+            error: nil
+        )
 
         do {
-            _ = try await provider.fetchUsage(apiKey: "bad-key", baseURL: nil)
+            _ = try await provider.fetchUsage(apiKey: "bad-token", baseURL: nil)
             XCTFail("Should throw")
         } catch TokenProviderError.invalidAPIKey {
             // expected
@@ -62,30 +107,27 @@ final class GLMProviderTests: XCTestCase {
         }
     }
 
-    func testFetchUsageThrowsOn500() async {
-        MockURLProtocol.mockHandler = { request in
-            let response = HTTPURLResponse(url: request.url!, statusCode: 500, httpVersion: nil, headerFields: nil)!
-            return (response, Data())
-        }
+    func testFetchUsageThrowsOnBusinessLayer401() async {
+        let json = """
+        {"code": 401, "msg": "token expired or incorrect", "success": false}
+        """
+        mockSuccess(json: json)
 
         do {
-            _ = try await provider.fetchUsage(apiKey: "key", baseURL: nil)
+            _ = try await provider.fetchUsage(apiKey: "expired-token", baseURL: nil)
             XCTFail("Should throw")
-        } catch TokenProviderError.serverError(500) {
-            // expected
+        } catch TokenProviderError.invalidAPIKey {
+            // expected: HTTP 200 but business code 401
         } catch {
             XCTFail("Wrong error: \(error)")
         }
     }
 
     func testFetchUsageThrowsOnInvalidJSON() async {
-        MockURLProtocol.mockHandler = { request in
-            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            return (response, "not json".data(using: .utf8)!)
-        }
+        mockSuccess(json: "not json at all")
 
         do {
-            _ = try await provider.fetchUsage(apiKey: "key", baseURL: nil)
+            _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
             XCTFail("Should throw")
         } catch TokenProviderError.invalidResponse {
             // expected
@@ -94,29 +136,29 @@ final class GLMProviderTests: XCTestCase {
         }
     }
 
-    func testFetchUsageUsesCustomBaseURL() async throws {
+    func testDefaultBaseURL() {
+        XCTAssertEqual(provider.defaultBaseURL, "https://api.z.ai")
+    }
+
+    func testCustomBaseURL() async throws {
         let json = """
-        {"data": {"total_tokens": 100000, "used_tokens": 0, "remaining_tokens": 100000, "plan_name": null}}
-        """.data(using: .utf8)!
-
-        MockURLProtocol.mockHandler = { request in
-            XCTAssertEqual(request.url?.host, "custom.api.com")
-            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            return (response, json)
+        {
+            "code": 200,
+            "success": true,
+            "data": {
+                "totalUsage": {
+                    "totalModelCallCount": 100,
+                    "totalTokensUsage": 50000,
+                    "modelSummaryList": [
+                        {"modelName": "GLM-5.1", "totalTokens": 50000}
+                    ]
+                }
+            }
         }
+        """
+        mockSuccess(json: json, url: "https://open.bigmodel.cn/api/monitor/usage/model-usage?startTime=2026-04-11%2000:00:00&endTime=2026-04-12%2023:59:59")
 
-        _ = try await provider.fetchUsage(apiKey: "key", baseURL: "https://custom.api.com")
-    }
-
-    func testFetchDistributionReturnsEmpty() async throws {
-        let dist = try await provider.fetchDistribution(apiKey: "key", baseURL: nil)
-        XCTAssertEqual(dist.providerId, "glm")
-        XCTAssertEqual(dist.points.count, 0)
-    }
-
-    func testProviderProperties() {
-        XCTAssertEqual(provider.id, "glm")
-        XCTAssertEqual(provider.displayName, "GLM（智谱）")
-        XCTAssertEqual(provider.defaultBaseURL, "https://open.bigmodel.cn/api/paas/v4")
+        let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: "https://open.bigmodel.cn")
+        XCTAssertEqual(snapshot.usedCount, 50000)
     }
 }

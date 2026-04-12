@@ -3,16 +3,17 @@ import Foundation
 class MiniMaxProvider: TokenProvider {
     let id = "minimax"
     let displayName = "MiniMax"
-    let defaultBaseURL = "https://api.minimax.chat"
+    let defaultBaseURL = "https://www.minimaxi.com"
     var urlSession: URLSession = .shared
 
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
         let base = baseURL ?? defaultBaseURL
-        guard let url = URL(string: "\(base)/v1/user/info") else {
+        guard let url = URL(string: "\(base)/v1/api/openplatform/coding_plan/remains") else {
             throw TokenProviderError.invalidResponse
         }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = 15
 
         let (data, response) = try await urlSession.data(for: request)
@@ -27,6 +28,7 @@ class MiniMaxProvider: TokenProvider {
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution {
+        // MiniMax API does not provide historical distribution data
         return UsageDistribution(
             providerId: id,
             windowStart: Date().addingTimeInterval(-5 * 3600),
@@ -37,33 +39,80 @@ class MiniMaxProvider: TokenProvider {
 
     private func parseUsageResponse(_ data: Data) throws -> UsageSnapshot {
         struct Response: Decodable {
-            let data: UsageData?
-            struct UsageData: Decodable {
-                let total: Int
-                let used: Int
-                let planName: String?
+            let modelRemains: [ModelRemain]?
+            let baseResp: BaseResp?
+
+            enum CodingKeys: String, CodingKey {
+                case modelRemains = "model_remains"
+                case baseResp = "base_resp"
+            }
+
+            struct ModelRemain: Decodable {
+                let modelName: String
+                let currentIntervalTotalCount: Int
+                let currentIntervalUsageCount: Int
+                let startTime: TimeInterval?
+                let endTime: TimeInterval?
+                let remainsTime: TimeInterval?
+
                 enum CodingKeys: String, CodingKey {
-                    case total, used
-                    case planName = "plan_name"
+                    case modelName = "model_name"
+                    case currentIntervalTotalCount = "current_interval_total_count"
+                    case currentIntervalUsageCount = "current_interval_usage_count"
+                    case startTime = "start_time"
+                    case endTime = "end_time"
+                    case remainsTime = "remains_time"
+                }
+            }
+
+            struct BaseResp: Decodable {
+                let statusCode: Int?
+                let statusMsg: String?
+
+                enum CodingKeys: String, CodingKey {
+                    case statusCode = "status_code"
+                    case statusMsg = "status_msg"
                 }
             }
         }
+
         let resp: Response
         do {
             resp = try JSONDecoder().decode(Response.self, from: data)
         } catch {
             throw TokenProviderError.invalidResponse
         }
-        guard let usage = resp.data else { throw TokenProviderError.invalidResponse }
-        let remaining = usage.total - usage.used
-        let percent = usage.total > 0 ? Double(remaining) / Double(usage.total) : 0
+
+        // Check base_resp for errors
+        if let statusCode = resp.baseResp?.statusCode, statusCode != 0 {
+            let msg = resp.baseResp?.statusMsg ?? "unknown"
+            throw TokenProviderError.serverError(statusCode)
+        }
+
+        // Find the main text model (MiniMax-M*) entry
+        guard let remains = resp.modelRemains, !remains.isEmpty else {
+            throw TokenProviderError.invalidResponse
+        }
+
+        // Prefer MiniMax-M* model, fall back to first entry
+        let mainModel = remains.first(where: { $0.modelName.hasPrefix("MiniMax-M") })
+            ?? remains.first!
+
+        let usedCount = mainModel.currentIntervalUsageCount
+        let totalCount = mainModel.currentIntervalTotalCount
+        let remaining = max(totalCount - usedCount, 0)
+        let percent = totalCount > 0 ? Double(remaining) / Double(totalCount) : 0
+
+        // end_time is in milliseconds
+        let refreshTime = mainModel.endTime.map { Date(timeIntervalSince1970: $0 / 1000) }
+
         return UsageSnapshot(
             providerId: id,
-            planName: usage.planName ?? "MiniMax",
-            usedCount: usage.used,
-            totalCount: usage.total,
+            planName: mainModel.modelName,
+            usedCount: usedCount,
+            totalCount: totalCount,
             remainingPercent: percent,
-            refreshTime: nil,
+            refreshTime: refreshTime,
             fetchedAt: Date(),
             status: .normal
         )
