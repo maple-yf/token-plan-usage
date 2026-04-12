@@ -6,7 +6,7 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                monitorView
+                MonitorView()
                     .navigationTitle("Token Usage")
                     .navigationBarTitleDisplayMode(.inline)
             }
@@ -23,14 +23,6 @@ struct MainTabView: View {
             }
             .tag(1)
         }
-    }
-
-    @ViewBuilder
-    private var monitorView: some View {
-        let provider = MiniMaxProvider()
-        let config = ProviderConfig.minimax
-
-        MonitorView(provider: provider, config: config)
     }
 }
 

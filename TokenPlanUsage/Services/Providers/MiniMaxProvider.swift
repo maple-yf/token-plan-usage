@@ -98,10 +98,11 @@ class MiniMaxProvider: TokenProvider {
         let mainModel = remains.first(where: { $0.modelName.hasPrefix("MiniMax-M") })
             ?? remains.first!
 
-        let usedCount = mainModel.currentIntervalUsageCount
+        // In the /remains endpoint context, usage_count = remaining count, not used count
+        let remainingCount = mainModel.currentIntervalUsageCount
         let totalCount = mainModel.currentIntervalTotalCount
-        let remaining = max(totalCount - usedCount, 0)
-        let percent = totalCount > 0 ? Double(remaining) / Double(totalCount) : 0
+        let usedCount = max(totalCount - remainingCount, 0)
+        let percent = totalCount > 0 ? Double(remainingCount) / Double(totalCount) : 0
 
         // end_time is in milliseconds
         let refreshTime = mainModel.endTime.map { Date(timeIntervalSince1970: $0 / 1000) }

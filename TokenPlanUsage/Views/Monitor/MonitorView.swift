@@ -1,6 +1,40 @@
 import SwiftUI
 
 struct MonitorView: View {
+    @State private var selectedProviderIndex = 0
+
+    private let providers: [(name: String, provider: TokenProvider, config: ProviderConfig)] = {
+        let minimaxProvider = MiniMaxProvider()
+        let glmProvider = GLMProvider()
+        let minimaxConfig = KeychainService.shared.load(providerId: "minimax") ?? ProviderConfig.minimax
+        let glmConfig = KeychainService.shared.load(providerId: "glm") ?? ProviderConfig.glm
+        return [
+            ("MiniMax", minimaxProvider, minimaxConfig),
+            ("GLM", glmProvider, glmConfig)
+        ]
+    }()
+
+    var body: some View {
+        let current = providers[selectedProviderIndex]
+        MonitorProviderView(provider: current.provider, config: current.config)
+            .id(selectedProviderIndex)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    ProviderSegmentControl(
+                        providers: providers.map { $0.name },
+                        selectedIndex: selectedProviderIndex,
+                        onSelect: { index in
+                            selectedProviderIndex = index
+                        }
+                    )
+                }
+            }
+    }
+}
+
+// MARK: - Per-Provider Monitor View
+
+private struct MonitorProviderView: View {
     @State private var viewModel: MonitorViewModel
 
     init(provider: TokenProvider, config: ProviderConfig) {
@@ -10,12 +44,6 @@ struct MonitorView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Provider segment control
-                ProviderSegmentControl(
-                    providers: ["MiniMax", "GLM"],
-                    selectedIndex: 0
-                )
-
                 if let snapshot = viewModel.snapshot {
                     // Stale data warning
                     staleDataWarning(snapshot: snapshot)
@@ -52,7 +80,7 @@ struct MonitorView: View {
 
                 // Status bar
                 StatusBarView(
-                    status: viewModel.snapshot?.status ?? .normal,
+                    status: viewModel.errorMessage != nil ? .error(viewModel.errorMessage ?? "") : (viewModel.snapshot?.status ?? .normal),
                     lastUpdated: viewModel.snapshot?.fetchedAt,
                     isLoading: viewModel.isLoading,
                     onRefresh: { Task { await viewModel.refresh() } }
@@ -203,11 +231,14 @@ struct MonitorView: View {
 struct ProviderSegmentControl: View {
     let providers: [String]
     let selectedIndex: Int
+    var onSelect: ((Int) -> Void)? = nil
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(Array(providers.enumerated()), id: \.offset) { index, name in
-                Button {} label: {
+                Button {
+                    onSelect?(index)
+                } label: {
                     Text(name)
                         .font(.subheadline.weight(selectedIndex == index ? .semibold : .regular))
                         .foregroundStyle(selectedIndex == index ? .primary : .secondary)
@@ -228,23 +259,5 @@ struct ProviderSegmentControl: View {
 }
 
 #Preview("Monitor") {
-    MonitorView(
-        provider: PreviewTokenProvider(),
-        config: ProviderConfig(id: "minimax", apiKey: "test", baseURL: nil, isEnabled: true)
-    )
-}
-
-private struct PreviewTokenProvider: TokenProvider {
-    let id = "minimax"
-    let displayName = "MiniMax"
-    let defaultBaseURL = "https://api.minimax.chat"
-    func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
-        UsageSnapshot(providerId: "minimax", planName: "MiniMax-M2.7",
-            usedCount: 25, totalCount: 600, remainingPercent: 0.958,
-            refreshTime: Date().addingTimeInterval(3246), fetchedAt: Date(), status: .normal)
-    }
-    func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution {
-        UsageDistribution(providerId: "minimax",
-            windowStart: Date().addingTimeInterval(-3600), windowEnd: Date(), points: [])
-    }
+    MonitorView()
 }

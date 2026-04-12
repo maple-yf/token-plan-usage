@@ -72,6 +72,15 @@ struct ProviderConfigView: View {
                 }
             }
         }
+        .onChange(of: config.apiKey) { _, _ in
+            try? KeychainService.shared.save(config)
+        }
+        .onChange(of: config.isEnabled) { _, _ in
+            try? KeychainService.shared.save(config)
+        }
+        .onChange(of: config.baseURL) { _, _ in
+            try? KeychainService.shared.save(config)
+        }
         .onChange(of: useCustomBaseURL) { _, isCustom in
             if !isCustom {
                 config.baseURL = nil

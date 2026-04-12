@@ -64,6 +64,11 @@ struct SettingsView: View {
             .padding()
         }
         .navigationTitle("设置")
+        .onChange(of: viewModel.providers) { _, newProviders in
+            for config in newProviders {
+                try? viewModel.updateProvider(config)
+            }
+        }
         .background(
             LinearGradient(
                 colors: [.blue.opacity(0.3), .purple.opacity(0.2)],

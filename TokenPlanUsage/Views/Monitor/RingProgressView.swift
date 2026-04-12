@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RingProgressView: View {
-    let progress: Double  // 0.0 to 1.0
+    let progress: Double  // 0.0 to 1.0, remaining percent
     let usedCount: Int
     let totalCount: Int
     let planName: String
