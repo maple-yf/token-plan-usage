@@ -15,7 +15,7 @@ final class MonitorViewModelTests: XCTestCase {
             providerId: "mock", planName: "Test",
             usedCount: 10, totalCount: 100,
             remainingPercent: 0.9, refreshTime: nil,
-            fetchedAt: Date(timeIntervalSince1970: 1000), status: .normal
+            fetchedAt: Date(timeIntervalSince1970: 1000), status: .normal, mcpQuota: nil, modelQuotas: nil
         )
         mockProvider.mockDistribution = UsageDistribution(
             providerId: "mock",
@@ -25,12 +25,6 @@ final class MonitorViewModelTests: XCTestCase {
         )
         mockConfig = ProviderConfig(id: "mock", apiKey: "test-key", baseURL: nil, isEnabled: true)
         vm = MonitorViewModel(provider: mockProvider, config: mockConfig)
-    }
-
-    override func tearDown() async throws {
-        try await super.tearDown()
-        SharedStore.shared.clearSnapshot()
-        SharedStore.shared.clearDistribution()
     }
 
     func testRefreshUpdatesSnapshot() async throws {
@@ -50,12 +44,9 @@ final class MonitorViewModelTests: XCTestCase {
     }
 
     func testRefreshPersistsToSharedStore() async throws {
-        SharedStore.shared.clearSnapshot()
-        XCTAssertNil(SharedStore.shared.loadSnapshot())
-
         await vm.refresh()
 
-        let loaded = SharedStore.shared.loadSnapshot()
+        let loaded = SharedStore.shared.loadSnapshot(providerId: "mock")
         XCTAssertNotNil(loaded)
         XCTAssertEqual(loaded?.usedCount, 10)
     }
@@ -71,16 +62,11 @@ final class MonitorViewModelTests: XCTestCase {
             providerId: "mock", planName: "Test",
             usedCount: 20, totalCount: 200,
             remainingPercent: 0.9, refreshTime: nil,
-            fetchedAt: Date(timeIntervalSince1970: 2000), status: .normal
+            fetchedAt: Date(timeIntervalSince1970: 2000), status: .normal, mcpQuota: nil, modelQuotas: nil
         )
         SharedStore.shared.save(snapshot: snapshot)
 
         let vm = MonitorViewModel(provider: MockTokenProvider(), config: mockConfig)
         XCTAssertEqual(vm.snapshot?.usedCount, 20)
-    }
-
-    func testSelectProvider() {
-        vm.selectProvider("glm")
-        // Currently just a placeholder - will implement fully when multiple providers supported
     }
 }

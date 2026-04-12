@@ -4,44 +4,32 @@ class SharedStore {
     static let shared = SharedStore()
 
     private let sharedDefaults = UserDefaults(suiteName: "group.com.tokenplan.usage")!
-    private let snapshotKey = "UsageSnapshot"
-    private let distributionKey = "UsageDistribution"
 
     func save(snapshot: UsageSnapshot) {
         if let data = try? JSONEncoder().encode(snapshot) {
-            sharedDefaults.set(data, forKey: snapshotKey)
+            sharedDefaults.set(data, forKey: "UsageSnapshot_\(snapshot.providerId)")
             sharedDefaults.synchronize()
         }
     }
 
-    func loadSnapshot() -> UsageSnapshot? {
-        guard let data = sharedDefaults.data(forKey: snapshotKey) else {
+    func loadSnapshot(providerId: String) -> UsageSnapshot? {
+        guard let data = sharedDefaults.data(forKey: "UsageSnapshot_\(providerId)") else {
             return nil
         }
         return try? JSONDecoder().decode(UsageSnapshot.self, from: data)
     }
 
-    func clearSnapshot() {
-        sharedDefaults.removeObject(forKey: snapshotKey)
-        sharedDefaults.synchronize()
-    }
-
     func save(distribution: UsageDistribution) {
         if let data = try? JSONEncoder().encode(distribution) {
-            sharedDefaults.set(data, forKey: distributionKey)
+            sharedDefaults.set(data, forKey: "UsageDistribution_\(distribution.providerId)")
             sharedDefaults.synchronize()
         }
     }
 
-    func loadDistribution() -> UsageDistribution? {
-        guard let data = sharedDefaults.data(forKey: distributionKey) else {
+    func loadDistribution(providerId: String) -> UsageDistribution? {
+        guard let data = sharedDefaults.data(forKey: "UsageDistribution_\(providerId)") else {
             return nil
         }
         return try? JSONDecoder().decode(UsageDistribution.self, from: data)
-    }
-
-    func clearDistribution() {
-        sharedDefaults.removeObject(forKey: distributionKey)
-        sharedDefaults.synchronize()
     }
 }
