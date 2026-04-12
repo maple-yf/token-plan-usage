@@ -8,6 +8,7 @@ class SettingsViewModel {
     ]
     var refreshInterval: TimeInterval = 5 * 60 // 5 minutes
     var widgetProvider: String = "minimax"
+    var baseURLValidationError: String?
 
     private let keychainService = KeychainService.shared
     private let sharedStore = SharedStore.shared
@@ -26,6 +27,12 @@ class SettingsViewModel {
     }
 
     func updateProvider(_ config: ProviderConfig) throws {
+        // Validate base URL before saving
+        if let baseURL = config.baseURL, !baseURL.isEmpty {
+            guard validateBaseURL(baseURL) else {
+                throw SettingsError.invalidBaseURL
+            }
+        }
         try keychainService.save(config)
         let index = providers.firstIndex { $0.id == config.id }
         if let idx = index {
@@ -41,8 +48,28 @@ class SettingsViewModel {
     }
 
     func validateBaseURL(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, !urlString.isEmpty else { return true }
-        guard let url = URL(string: urlString) else { return false }
-        return url.scheme == "https"
+        baseURLValidationError = nil
+        guard let urlString = urlString, !urlString.isEmpty else { return true } // nil/empty = default = valid
+        guard urlString.hasPrefix("https://") else {
+            baseURLValidationError = "Base URL 必须以 https:// 开头"
+            return false
+        }
+        guard let url = URL(string: urlString),
+              let host = url.host,
+              !host.isEmpty else {
+            baseURLValidationError = "URL 格式无效"
+            return false
+        }
+        return true
+    }
+
+    enum SettingsError: LocalizedError {
+        case invalidBaseURL
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidBaseURL: return "Base URL 格式无效，必须以 https:// 开头且为合法 URL"
+            }
+        }
     }
 }

@@ -21,6 +21,8 @@ final class SettingsViewModelTests: XCTestCase {
         try? keychainService.delete(providerId: "glm")
     }
 
+    // MARK: - Initial State
+
     func testInitialLoadDefaults() {
         XCTAssertNotNil(vm.providers)
         XCTAssertEqual(vm.providers.count, 2)
@@ -29,6 +31,8 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(vm.refreshInterval, 300)
         XCTAssertEqual(vm.widgetProvider, "minimax")
     }
+
+    // MARK: - Provider Updates
 
     func testUpdateProvider() throws {
         let newConfig = ProviderConfig(
@@ -63,6 +67,21 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(glmProvider?.apiKey, "sk-glm-test")
     }
 
+    func testUpdateProviderRejectsInvalidBaseURL() {
+        let config = ProviderConfig(
+            id: "minimax",
+            apiKey: "sk-test",
+            baseURL: "http://insecure.com",
+            isEnabled: true
+        )
+
+        XCTAssertThrowsError(try vm.updateProvider(config)) { error in
+            XCTAssertTrue(error is SettingsViewModel.SettingsError)
+        }
+    }
+
+    // MARK: - Toggle
+
     func testToggleProvider() throws {
         XCTAssertTrue(vm.providers[0].isEnabled)
         try vm.toggleProvider("minimax")
@@ -73,18 +92,35 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertFalse(loaded?.isEnabled ?? true)
     }
 
+    // MARK: - Base URL Validation
+
     func testValidateBaseURLValid() {
         XCTAssertTrue(vm.validateBaseURL("https://example.com"))
+        XCTAssertNil(vm.baseURLValidationError)
         XCTAssertTrue(vm.validateBaseURL(nil))
         XCTAssertTrue(vm.validateBaseURL(""))  // empty = use default = valid
         XCTAssertTrue(vm.validateBaseURL("https://api.minimax.chat/v1"))
+        XCTAssertTrue(vm.validateBaseURL("https://open.bigmodel.cn/api/paas/v4"))
     }
 
     func testValidateBaseURLInvalid() {
         XCTAssertFalse(vm.validateBaseURL("http://insecure.com"))
+        XCTAssertNotNil(vm.baseURLValidationError)
+
         XCTAssertFalse(vm.validateBaseURL("ftp://example.com"))
         XCTAssertFalse(vm.validateBaseURL("not-a-url"))
+        XCTAssertFalse(vm.validateBaseURL("https://"))
     }
+
+    func testValidateBaseURLErrorMessage() {
+        _ = vm.validateBaseURL("http://test.com")
+        XCTAssertEqual(vm.baseURLValidationError, "Base URL 必须以 https:// 开头")
+
+        _ = vm.validateBaseURL("https://")
+        XCTAssertEqual(vm.baseURLValidationError, "URL 格式无效")
+    }
+
+    // MARK: - Settings
 
     func testRefreshInterval() {
         vm.refreshInterval = 10 * 60
