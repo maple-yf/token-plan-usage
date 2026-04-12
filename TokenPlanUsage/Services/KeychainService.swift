@@ -7,11 +7,17 @@ class KeychainService {
     private let serviceName = "com.tokenplan.usage"
 
     func save(_ config: ProviderConfig) throws {
-        guard let data = try JSONEncoder().encode(config) else {
-            throw KeychainError.encodingFailed
-        }
+        let data = try JSONEncoder().encode(config)
 
-        let query: [String: Any] = [
+        // Delete existing item first (upsert pattern)
+        let deleteQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: serviceName,
+            kSecAttrAccount as String: config.id
+        ]
+        SecItemDelete(deleteQuery as CFDictionary)
+
+        let addQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: serviceName,
             kSecAttrAccount as String: config.id,
@@ -19,7 +25,7 @@ class KeychainService {
             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         ]
 
-        let status = SecItemAdd(query as CFDictionary, nil)
+        let status = SecItemAdd(addQuery as CFDictionary, nil)
         if status != errSecSuccess {
             throw KeychainError.additionFailed(status)
         }
@@ -58,13 +64,11 @@ class KeychainService {
     }
 
     enum KeychainError: LocalizedError {
-        case encodingFailed
         case additionFailed(OSStatus)
         case deletionFailed(OSStatus)
 
         var errorDescription: String? {
             switch self {
-            case .encodingFailed: return "编码失败"
             case .additionFailed(let status): return "添加 Keychain 项失败: \(status)"
             case .deletionFailed(let status): return "删除 Keychain 项失败: \(status)"
             }

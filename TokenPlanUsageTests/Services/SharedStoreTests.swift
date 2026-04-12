@@ -28,7 +28,7 @@ final class SharedStoreTests: XCTestCase {
         XCTAssertEqual(loaded?.providerId, "test")
         XCTAssertEqual(loaded?.usedCount, 10)
         XCTAssertEqual(loaded?.totalCount, 100)
-        XCTAssertEqual(loaded?.remainingPercent, 0.9, accuracy: 0.001)
+        XCTAssertEqual(loaded!.remainingPercent, 0.9, accuracy: 0.001)
     }
 
     func testSaveAndLoadDistribution() {

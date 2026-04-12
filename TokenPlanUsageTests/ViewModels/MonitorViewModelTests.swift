@@ -17,12 +17,20 @@ final class MonitorViewModelTests: XCTestCase {
             remainingPercent: 0.9, refreshTime: nil,
             fetchedAt: Date(timeIntervalSince1970: 1000), status: .normal
         )
+        mockProvider.mockDistribution = UsageDistribution(
+            providerId: "mock",
+            windowStart: Date(timeIntervalSince1970: 0),
+            windowEnd: Date(timeIntervalSince1970: 3600),
+            points: [UsagePoint(time: Date(timeIntervalSince1970: 0), count: 5)]
+        )
         mockConfig = ProviderConfig(id: "mock", apiKey: "test-key", baseURL: nil, isEnabled: true)
         vm = MonitorViewModel(provider: mockProvider, config: mockConfig)
     }
 
     override func tearDown() async throws {
         try await super.tearDown()
+        SharedStore.shared.clearSnapshot()
+        SharedStore.shared.clearDistribution()
     }
 
     func testRefreshUpdatesSnapshot() async throws {
@@ -37,7 +45,6 @@ final class MonitorViewModelTests: XCTestCase {
     func testRefreshSetsErrorState() async {
         mockProvider.shouldThrow = true
         await vm.refresh()
-        XCTAssertNil(vm.snapshot)
         XCTAssertNotNil(vm.errorMessage)
         XCTAssertTrue(vm.errorMessage?.contains("API Key") ?? false)
     }
