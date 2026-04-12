@@ -98,7 +98,6 @@ class MiniMaxProvider: TokenProvider {
         let mainModel = remains.first(where: { $0.modelName.hasPrefix("MiniMax-M") })
             ?? remains.first!
 
-        // In the /remains endpoint context, usage_count = remaining count, not used count
         let remainingCount = mainModel.currentIntervalUsageCount
         let totalCount = mainModel.currentIntervalTotalCount
         let usedCount = max(totalCount - remainingCount, 0)
@@ -115,7 +114,19 @@ class MiniMaxProvider: TokenProvider {
             remainingPercent: percent,
             refreshTime: refreshTime,
             fetchedAt: Date(),
-            status: .normal
+            status: .normal,
+            mcpQuota: nil,
+            modelQuotas: remains.map { model in
+                let remaining = model.currentIntervalUsageCount
+                let total = model.currentIntervalTotalCount
+                let used = max(total - remaining, 0)
+                return MiniMaxModelQuota(
+                    modelName: model.modelName,
+                    usedCount: used,
+                    totalCount: total,
+                    remainingCount: remaining
+                )
+            }.sorted { $0.totalCount > $1.totalCount }
         )
     }
 }

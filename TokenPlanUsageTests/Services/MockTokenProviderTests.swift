@@ -27,7 +27,7 @@ final class MockTokenProviderTests: XCTestCase {
         provider.mockSnapshot = UsageSnapshot(
             providerId: "mock", planName: "Test", usedCount: 10, totalCount: 100,
             remainingPercent: 0.9, refreshTime: nil,
-            fetchedAt: Date(timeIntervalSince1970: 1000), status: .normal
+            fetchedAt: Date(timeIntervalSince1970: 1000), status: .normal, mcpQuota: nil, modelQuotas: nil
         )
         let result = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
         XCTAssertEqual(result.usedCount, 10)

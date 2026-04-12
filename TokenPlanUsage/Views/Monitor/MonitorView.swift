@@ -62,11 +62,22 @@ private struct MonitorProviderView: View {
                     UsageDetailView(
                         usedCount: snapshot.usedCount,
                         totalCount: snapshot.totalCount,
+                        remainingPercent: snapshot.remainingPercent,
                         remainingTimeString: formatRemainingTime(snapshot.refreshTime)
                     )
 
-                    // Trend chart
-                    if let distribution = viewModel.distribution {
+                    // MCP quota (GLM only)
+                    if let mcpQuota = snapshot.mcpQuota {
+                        MCPQuotaView(quota: mcpQuota)
+                    }
+
+                    // MiniMax model quotas
+                    if let modelQuotas = snapshot.modelQuotas {
+                        MiniMaxModelsView(quotas: modelQuotas)
+                    }
+
+                    // Trend chart (skip for MiniMax — no historical data)
+                    if let distribution = viewModel.distribution, !distribution.points.isEmpty {
                         UsageTrendChart(points: distribution.points)
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }

@@ -12,7 +12,9 @@ final class UsageSnapshotTests: XCTestCase {
             remainingPercent: 0.958,
             refreshTime: Date(timeIntervalSince1970: 1713000000),
             fetchedAt: Date(timeIntervalSince1970: 1712990000),
-            status: .normal
+            status: .normal,
+            mcpQuota: nil,
+            modelQuotas: nil
         )
         let data = try JSONEncoder().encode(snapshot)
         let decoded = try JSONDecoder().decode(UsageSnapshot.self, from: data)
@@ -21,6 +23,28 @@ final class UsageSnapshotTests: XCTestCase {
         XCTAssertEqual(decoded.totalCount, 600)
         XCTAssertEqual(decoded.remainingPercent, 0.958, accuracy: 0.001)
         XCTAssertEqual(decoded.status, .normal)
+        XCTAssertNil(decoded.mcpQuota)
+    }
+
+    func testEncodeDecodeWithMCPQuota() throws {
+        let snapshot = UsageSnapshot(
+            providerId: "glm",
+            planName: "GLM Coding Plan",
+            usedCount: 0,
+            totalCount: 0,
+            remainingPercent: 0.99,
+            refreshTime: nil,
+            fetchedAt: Date(timeIntervalSince1970: 1713000000),
+            status: .normal,
+            mcpQuota: MCPQuota(usedCount: 3, totalCount: 1000, remainingCount: 997),
+            modelQuotas: nil
+        )
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(UsageSnapshot.self, from: data)
+        XCTAssertNotNil(decoded.mcpQuota)
+        XCTAssertEqual(decoded.mcpQuota?.usedCount, 3)
+        XCTAssertEqual(decoded.mcpQuota?.totalCount, 1000)
+        XCTAssertEqual(decoded.mcpQuota?.remainingCount, 997)
     }
 
     func testAPIStatusNormal() throws {

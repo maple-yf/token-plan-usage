@@ -20,7 +20,9 @@ struct TokenUsageProvider: TimelineProvider {
                 remainingPercent: 0.958,
                 refreshTime: nil,
                 fetchedAt: Date(),
-                status: .normal
+                status: .normal,
+                mcpQuota: nil,
+                modelQuotas: nil
             )
         )
     }
@@ -42,7 +44,11 @@ struct TokenUsageProvider: TimelineProvider {
 
     private func loadSnapshot() -> UsageSnapshot? {
         let sharedStore = SharedStore.shared
-        return sharedStore.loadSnapshot()
+        let providers = ["minimax", "glm"]
+        // Load the most recently fetched snapshot across providers
+        return providers.compactMap { sharedStore.loadSnapshot(providerId: $0) }
+            .sorted { $0.fetchedAt > $1.fetchedAt }
+            .first
     }
 }
 
