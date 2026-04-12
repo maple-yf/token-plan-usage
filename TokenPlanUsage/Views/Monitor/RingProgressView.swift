@@ -6,6 +6,7 @@ struct RingProgressView: View {
     let totalCount: Int
     let planName: String
     let remainingTimeString: String?
+    var onRefresh: (() -> Void)?
 
     @State private var animatedProgress: Double = 0
 
@@ -43,8 +44,13 @@ struct RingProgressView: View {
                 }
             }
             .frame(width: 180, height: 180)
+            .contentShape(Circle())
+            .onTapGesture {
+                onRefresh?()
+            }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("用量进度 \(Int(progress * 100))% 剩余")
+            .accessibilityHint("点击刷新数据")
 
             VStack(spacing: 4) {
                 Text(planName)

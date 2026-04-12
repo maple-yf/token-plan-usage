@@ -36,11 +36,11 @@
 		9130CFD6E9C989791BFA3E98 /* UsageTrendChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8110157B74E5CC8B44374347 /* UsageTrendChart.swift */; };
 		92FBCDBEBAA3FC84DEADE64A /* MockTokenProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */; };
 		956F10A8BD9315691FEB155D /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */; };
-		A1B2C3D4E5F6A7B8C9D0E1F2 /* MiniMaxModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E1D0C9B8A7F6A4D3E2C1B0 /* MiniMaxModelsView.swift */; };
 		B1A1CCD59D9E58D12E2DFA30 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874DC9C83DFA8A3BAE409B56 /* KeychainService.swift */; };
 		BB60A462D20B67F16051DE8B /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */; };
 		BD1B0A83D4D5A49EBEC9836E /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0C4F50F1D053067224EC39 /* GLMProvider.swift */; };
 		BD63D66075C5A69B4CDF9F50 /* MonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A023529455FE042541F4B38 /* MonitorView.swift */; };
+		BDEC78D05805E9A8DA6C2CE1 /* RingProgressViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905BF6D3F58E20AA8DCEB7C6 /* RingProgressViewTests.swift */; };
 		C09199DBDDE13D7C773B22A1 /* GLMProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */; };
 		C193E5B85DB73B6A34467ED8 /* RingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A15F503173370A66249088B /* RingProgressView.swift */; };
 		C46EABF54DBFCD338A87B7AE /* MCPQuotaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BAFB654059AB8D32E5DA463 /* MCPQuotaView.swift */; };
@@ -49,6 +49,7 @@
 		EEA57DF3E997376FFF076F0D /* MiniMaxProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */; };
 		F465861D60751A259C5E8CF1 /* UsageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29605819F561127FBA8538E /* UsageDetailView.swift */; };
 		FB9B7AB15C998A42726F331A /* KeychainServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE52CCEC37AC0D02BD06B65E /* KeychainServiceTests.swift */; };
+		FDCE06B69401E67FD64E83FA /* MiniMaxModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBA39235E06D3086019C1D3 /* MiniMaxModelsView.swift */; };
 		FE0C0891CE8E8136E0196AE7 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49EC521B20E0E190FF2645A0 /* SettingsViewModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -89,11 +90,13 @@
 		87EFFB2AD875977B37065093 /* MonitorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorViewModelTests.swift; sourceTree = "<group>"; };
 		882016BD405BD6642F62B928 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshotTests.swift; sourceTree = "<group>"; };
+		905BF6D3F58E20AA8DCEB7C6 /* RingProgressViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingProgressViewTests.swift; sourceTree = "<group>"; };
 		9B1E92C9FD1A13849556439A /* TokenPlanUsageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageTests.swift; sourceTree = "<group>"; };
 		A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProviderTests.swift; sourceTree = "<group>"; };
 		A20287B47B6D7FF7203A903E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A49D595AFA4A027D5B0EBB07 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageSnapshot.swift; sourceTree = "<group>"; };
+		BEBA39235E06D3086019C1D3 /* MiniMaxModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxModelsView.swift; sourceTree = "<group>"; };
 		C27322AE0C758F10E8C2A168 /* RefreshManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshManager.swift; sourceTree = "<group>"; };
 		C49872554EEB076DC8F98053 /* SharedStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStoreTests.swift; sourceTree = "<group>"; };
 		CE52CCEC37AC0D02BD06B65E /* KeychainServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainServiceTests.swift; sourceTree = "<group>"; };
@@ -104,7 +107,6 @@
 		DB05137FA96DC41F6E9696B2 /* TokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenProvider.swift; sourceTree = "<group>"; };
 		E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsage.entitlements; sourceTree = "<group>"; };
 		F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageApp.swift; sourceTree = "<group>"; };
-		F2E1D0C9B8A7F6A4D3E2C1B0 /* MiniMaxModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxModelsView.swift; sourceTree = "<group>"; };
 		F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,6 +139,14 @@
 				3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */,
 			);
 			path = Providers;
+			sourceTree = "<group>";
+		};
+		3653595A07E5C3C2B506951F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				905BF6D3F58E20AA8DCEB7C6 /* RingProgressViewTests.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		386077059752BBC116298F3D /* Services */ = {
@@ -229,6 +239,7 @@
 				EDF71F3FB2E20B84D058DD5F /* Models */,
 				386077059752BBC116298F3D /* Services */,
 				7C04F7488A7FE70019DDE15E /* ViewModels */,
+				3653595A07E5C3C2B506951F /* Views */,
 			);
 			path = TokenPlanUsageTests;
 			sourceTree = "<group>";
@@ -288,7 +299,7 @@
 			isa = PBXGroup;
 			children = (
 				7BAFB654059AB8D32E5DA463 /* MCPQuotaView.swift */,
-				F2E1D0C9B8A7F6A4D3E2C1B0 /* MiniMaxModelsView.swift */,
+				BEBA39235E06D3086019C1D3 /* MiniMaxModelsView.swift */,
 				6A023529455FE042541F4B38 /* MonitorView.swift */,
 				2A15F503173370A66249088B /* RingProgressView.swift */,
 				4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */,
@@ -436,6 +447,7 @@
 				EEA57DF3E997376FFF076F0D /* MiniMaxProviderTests.swift in Sources */,
 				92FBCDBEBAA3FC84DEADE64A /* MockTokenProviderTests.swift in Sources */,
 				DAD4C6195CD1B8C4D741376C /* MonitorViewModelTests.swift in Sources */,
+				BDEC78D05805E9A8DA6C2CE1 /* RingProgressViewTests.swift in Sources */,
 				D7702432FC9DEF2F71FF8521 /* SettingsViewModelTests.swift in Sources */,
 				63093480B2EA1C3A5692BFC5 /* SharedStoreTests.swift in Sources */,
 				63468AB26A9D15DDD89DA2A0 /* TokenPlanUsageTests.swift in Sources */,
@@ -452,8 +464,8 @@
 				BD1B0A83D4D5A49EBEC9836E /* GLMProvider.swift in Sources */,
 				B1A1CCD59D9E58D12E2DFA30 /* KeychainService.swift in Sources */,
 				C46EABF54DBFCD338A87B7AE /* MCPQuotaView.swift in Sources */,
-				A1B2C3D4E5F6A7B8C9D0E1F2 /* MiniMaxModelsView.swift in Sources */,
 				573EC7D6E33C2BB264AE8997 /* MainTabView.swift in Sources */,
+				FDCE06B69401E67FD64E83FA /* MiniMaxModelsView.swift in Sources */,
 				BB60A462D20B67F16051DE8B /* MiniMaxProvider.swift in Sources */,
 				BD63D66075C5A69B4CDF9F50 /* MonitorView.swift in Sources */,
 				5A32E8E7AEE460FC9D5EE8AA /* MonitorViewModel.swift in Sources */,

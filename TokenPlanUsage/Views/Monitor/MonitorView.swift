@@ -54,7 +54,8 @@ private struct MonitorProviderView: View {
                         usedCount: snapshot.usedCount,
                         totalCount: snapshot.totalCount,
                         planName: snapshot.planName,
-                        remainingTimeString: formatRemainingTime(snapshot.refreshTime)
+                        remainingTimeString: formatRemainingTime(snapshot.refreshTime),
+                        onRefresh: { Task { await viewModel.refresh() } }
                     )
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
 
