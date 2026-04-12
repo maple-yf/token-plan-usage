@@ -54,7 +54,9 @@ struct SmallWidgetView: View {
             }
             .frame(width: 60, height: 60)
 
-            Text("\(snapshot.usedCount)/\(snapshot.totalCount)")
+            Text(snapshot.totalCount > 0
+                 ? "\(snapshot.usedCount)/\(snapshot.totalCount)"
+                 : "\(Int(round((1.0 - snapshot.remainingPercent) * 100)))% 已用")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }

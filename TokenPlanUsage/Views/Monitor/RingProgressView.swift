@@ -9,6 +9,8 @@ struct RingProgressView: View {
 
     @State private var animatedProgress: Double = 0
 
+    private var isPercentageMode: Bool { totalCount == 0 }
+
     var body: some View {
         VStack(spacing: 16) {
             ZStack {
@@ -48,10 +50,9 @@ struct RingProgressView: View {
                 Text(planName)
                     .font(.headline)
                     .foregroundStyle(.primary)
-                Text("\(usedCount) / \(totalCount) 次")
+                Text(countOrPercentageText)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .accessibilityLabel("已使用 \(usedCount) 次，共 \(totalCount) 次")
                 if let timeStr = remainingTimeString {
                     Text(timeStr + " 后刷新")
                         .font(.caption)
@@ -77,6 +78,14 @@ struct RingProgressView: View {
 
     private var remainingPercentText: String {
         String(format: "%.0f%%", progress * 100)
+    }
+
+    private var countOrPercentageText: String {
+        if isPercentageMode {
+            let usedPercent = Int(round((1.0 - progress) * 100))
+            return "已用 \(usedPercent)%"
+        }
+        return "\(usedCount) / \(totalCount) 次"
     }
 }
 

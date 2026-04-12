@@ -54,8 +54,13 @@ final class GLMProviderTests: XCTestCase {
 
         let snapshot = try await provider.fetchUsage(apiKey: "coding-plan-token", baseURL: nil)
         XCTAssertEqual(snapshot.providerId, "glm")
-        XCTAssertEqual(snapshot.usedCount, 50562802)
+        // TOKENS_LIMIT has no counts — usedCount/totalCount are 0 when quota unavailable
+        XCTAssertEqual(snapshot.usedCount, 0)
+        XCTAssertEqual(snapshot.totalCount, 0)
+        // remainingPercent = 100% when no percentage data
+        XCTAssertEqual(snapshot.remainingPercent, 1.0, accuracy: 0.001)
         XCTAssertTrue(snapshot.planName.contains("GLM-5.1"))
+        XCTAssertNil(snapshot.mcpQuota)
     }
 
     func testFetchDistributionParsesHourlyData() async throws {
@@ -65,12 +70,18 @@ final class GLMProviderTests: XCTestCase {
             "success": true,
             "data": {
                 "x_time": ["2026-04-11 09:00", "2026-04-11 10:00", "2026-04-11 11:00"],
-                "tokens_usage": [1033418, 836219, 2219443]
+                "tokens_usage": [1033418, 836219, 2219443],
+                "totalUsage": {
+                    "totalModelCallCount": 100,
+                    "totalTokensUsage": 4089080
+                }
             }
         }
         """
         mockSuccess(json: json)
 
+        // fetchUsage caches the distribution from the same response
+        _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
         let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
         XCTAssertEqual(distribution.providerId, "glm")
         XCTAssertEqual(distribution.points.count, 3)
@@ -80,10 +91,11 @@ final class GLMProviderTests: XCTestCase {
 
     func testFetchDistributionWithEmptyData() async throws {
         let json = """
-        {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": []}}
+        {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
         """
         mockSuccess(json: json)
 
+        _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
         let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
         XCTAssertEqual(distribution.points.count, 0)
     }
@@ -159,6 +171,9 @@ final class GLMProviderTests: XCTestCase {
         mockSuccess(json: json, url: "https://open.bigmodel.cn/api/monitor/usage/model-usage?startTime=2026-04-11%2000:00:00&endTime=2026-04-12%2023:59:59")
 
         let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: "https://open.bigmodel.cn")
-        XCTAssertEqual(snapshot.usedCount, 50000)
+        // No quota data → usedCount and totalCount are 0
+        XCTAssertEqual(snapshot.usedCount, 0)
+        XCTAssertEqual(snapshot.totalCount, 0)
+        XCTAssertTrue(snapshot.planName.contains("GLM-5.1"))
     }
 }

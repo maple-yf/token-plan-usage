@@ -38,7 +38,7 @@ struct UsageTrendChart: View {
             .interpolationMethod(.catmullRom)
         }
         .chartXAxis {
-            AxisMarks(values: .stride(by: .hour, count: 1)) { _ in
+            AxisMarks(values: xAxisValues) { value in
                 AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
                     .foregroundStyle(.quaternary)
                 AxisValueLabel(format: .dateTime.hour().minute())
@@ -54,6 +54,20 @@ struct UsageTrendChart: View {
             }
         }
         .frame(height: 160)
+    }
+
+    /// Pick 5 evenly spaced time values from the data points for x-axis labels
+    private var xAxisValues: [Date] {
+        guard points.count > 5 else { return points.map(\.time) }
+        return (0..<5).map { i in
+            let index = Double(i) / 4.0 * Double(points.count - 1)
+            let lower = Int(index.rounded(.down))
+            let upper = min(lower + 1, points.count - 1)
+            let frac = index - Double(lower)
+            return points[lower].time.addingTimeInterval(
+                points[upper].time.timeIntervalSince(points[lower].time) * frac
+            )
+        }
     }
 
     private var emptyState: some View {
