@@ -4,7 +4,7 @@ import SwiftUI
 struct TokenPlanUsageApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
     }
 }
