@@ -17,6 +17,8 @@ struct UsageTrendChart: View {
             }
         }
         .padding()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("用量趋势图表，共 \(points.count) 个数据点")
     }
 
     private var chartContent: some View {
@@ -38,15 +40,15 @@ struct UsageTrendChart: View {
         .chartXAxis {
             AxisMarks(values: .stride(by: .hour, count: 1)) { _ in
                 AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                    .foregroundStyle(.white.opacity(0.1))
+                    .foregroundStyle(.quaternary)
                 AxisValueLabel(format: .dateTime.hour().minute())
                     .font(.caption2)
             }
         }
         .chartYAxis {
-            AxisMarks { value in
+            AxisMarks { _ in
                 AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                    .foregroundStyle(.white.opacity(0.1))
+                    .foregroundStyle(.quaternary)
                 AxisValueLabel()
                     .font(.caption2)
             }
@@ -56,7 +58,7 @@ struct UsageTrendChart: View {
 
     private var emptyState: some View {
         RoundedRectangle(cornerRadius: 12)
-            .fill(.white.opacity(0.05))
+            .fill(.quaternary)
             .frame(height: 160)
             .overlay {
                 VStack(spacing: 8) {
@@ -67,6 +69,7 @@ struct UsageTrendChart: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityLabel("暂无趋势数据")
             }
     }
 }

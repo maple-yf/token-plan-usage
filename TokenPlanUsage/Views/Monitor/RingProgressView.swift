@@ -15,7 +15,7 @@ struct RingProgressView: View {
                 // Background ring
                 Circle()
                     .stroke(lineWidth: 18)
-                    .foregroundStyle(.white.opacity(0.15))
+                    .foregroundStyle(.quaternary)
 
                 // Progress ring
                 Circle()
@@ -41,6 +41,8 @@ struct RingProgressView: View {
                 }
             }
             .frame(width: 180, height: 180)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("用量进度 \(Int(progress * 100))% 剩余")
 
             VStack(spacing: 4) {
                 Text(planName)
@@ -49,10 +51,12 @@ struct RingProgressView: View {
                 Text("\(usedCount) / \(totalCount) 次")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .accessibilityLabel("已使用 \(usedCount) 次，共 \(totalCount) 次")
                 if let timeStr = remainingTimeString {
                     Text(timeStr + " 后刷新")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
+                        .accessibilityLabel("剩余 \(timeStr) 后刷新")
                 }
             }
         }
@@ -76,7 +80,7 @@ struct RingProgressView: View {
     }
 }
 
-#Preview {
+#Preview("Light") {
     ZStack {
         Color.blue.opacity(0.3).ignoresSafeArea()
         RingProgressView(
@@ -87,4 +91,18 @@ struct RingProgressView: View {
             remainingTimeString: "54:06"
         )
     }
+}
+
+#Preview("Dark") {
+    ZStack {
+        Color.blue.opacity(0.3).ignoresSafeArea()
+        RingProgressView(
+            progress: 0.958,
+            usedCount: 25,
+            totalCount: 600,
+            planName: "MiniMax-M2.7",
+            remainingTimeString: "54:06"
+        )
+    }
+    .preferredColorScheme(.dark)
 }

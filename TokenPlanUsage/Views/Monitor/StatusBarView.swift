@@ -27,6 +27,7 @@ struct StatusBarView: View {
                 .fill(statusColor)
                 .frame(width: 8, height: 8)
                 .shadow(color: statusColor.opacity(0.5), radius: 4)
+                .accessibilityHidden(true)
 
             Text(statusText)
                 .font(.caption)
@@ -59,10 +60,14 @@ struct StatusBarView: View {
                 }
             }
             .disabled(isLoading)
+            .accessibilityLabel("刷新数据")
+            .accessibilityHint("下拉获取最新用量数据")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("状态栏：\(statusText)，\(lastUpdated != nil ? "最后更新 \(lastUpdated!.formatted(date: .omitted, time: .shortened))" : "尚未更新")")
     }
 }
 
