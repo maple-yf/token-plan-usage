@@ -60,17 +60,20 @@ struct UsageTrendChart: View {
         .frame(height: 160)
     }
 
-    /// 智能自适应单位：原始数字 → 万 → 亿
+    /// Smart unit: K / M / G / B
     private static func formatTokenCount(_ count: Int) -> String {
-        if count >= 100_000_000 {
-            let value = Double(count) / 100_000_000.0
-            return value == floor(value) ? "\(Int(value))亿" : String(format: "%.1f亿", value)
-        } else if count >= 10_000 {
-            let value = Double(count) / 10_000.0
-            return value == floor(value) ? "\(Int(value))万" : String(format: "%.1f万", value)
-        } else {
-            return "\(count)"
+        let thresholds: [(divisor: Double, suffix: String)] = [
+            (1_000_000_000.0, "B"),
+            (1_000_000.0, "M"),
+            (1_000.0, "K"),
+        ]
+        for (divisor, suffix) in thresholds {
+            if Double(count) >= divisor {
+                let value = Double(count) / divisor
+                return value == floor(value) ? "\(Int(value))\(suffix)" : String(format: "%.1f\(suffix)", value)
+            }
         }
+        return "\(count)"
     }
 
     /// Pick 5 evenly spaced time values from the data points for x-axis labels
