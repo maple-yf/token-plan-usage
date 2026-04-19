@@ -25,14 +25,14 @@ struct UsageTrendChart: View {
         Chart(points) { point in
             LineMark(
                 x: .value("时间", point.time),
-                y: .value("次数", point.count)
+                y: .value("Tokens", point.count)
             )
             .foregroundStyle(.blue.gradient)
             .interpolationMethod(.catmullRom)
 
             AreaMark(
                 x: .value("时间", point.time),
-                y: .value("次数", point.count)
+                y: .value("Tokens", point.count)
             )
             .foregroundStyle(.blue.opacity(0.1).gradient)
             .interpolationMethod(.catmullRom)
@@ -46,14 +46,31 @@ struct UsageTrendChart: View {
             }
         }
         .chartYAxis {
-            AxisMarks { _ in
+            AxisMarks { value in
                 AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
                     .foregroundStyle(.quaternary)
-                AxisValueLabel()
-                    .font(.caption2)
+                AxisValueLabel {
+                    if let intValue = value.as(Int.self) {
+                        Text(Self.formatTokenCount(intValue))
+                            .font(.caption2)
+                    }
+                }
             }
         }
         .frame(height: 160)
+    }
+
+    /// 智能自适应单位：原始数字 → 万 → 亿
+    private static func formatTokenCount(_ count: Int) -> String {
+        if count >= 100_000_000 {
+            let value = Double(count) / 100_000_000.0
+            return value == floor(value) ? "\(Int(value))亿" : String(format: "%.1f亿", value)
+        } else if count >= 10_000 {
+            let value = Double(count) / 10_000.0
+            return value == floor(value) ? "\(Int(value))万" : String(format: "%.1f万", value)
+        } else {
+            return "\(count)"
+        }
     }
 
     /// Pick 5 evenly spaced time values from the data points for x-axis labels
@@ -92,7 +109,7 @@ struct UsageTrendChart: View {
     let points = (0..<10).map { i in
         UsagePoint(
             time: Date().addingTimeInterval(-Double(9 - i) * 1800),
-            count: Int.random(in: 1...20)
+            count: Int.random(in: 1...20000)
         )
     }
     return UsageTrendChart(points: points)
