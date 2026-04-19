@@ -97,10 +97,10 @@
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidgetEntryView.swift; sourceTree = "<group>"; };
-		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 		3F0C4F50F1D053067224EC39 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
-		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		49EC521B20E0E190FF2645A0 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		5C939396B63BC8250C5FF97D /* MockTokenProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTokenProviderTests.swift; sourceTree = "<group>"; };
@@ -412,12 +412,6 @@
 					8F8C55C1B1E00C1CF99F17D8 = {
 						DevelopmentTeam = "";
 					};
-					D26060D0B85A84F26C8E773B = {
-						DevelopmentTeam = "";
-					};
-					E2DC38F74E6FEF2BBCDE3DD8 = {
-						DevelopmentTeam = "";
-					};
 				};
 			};
 			buildConfigurationList = E88327032F2441FBA64A6614 /* Build configuration list for PBXProject "TokenPlanUsage" */;
@@ -539,6 +533,7 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -562,6 +557,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
@@ -584,6 +580,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
@@ -665,6 +662,7 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
