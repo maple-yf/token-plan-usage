@@ -5,6 +5,7 @@ struct UsageDistribution: Codable, Equatable {
     let windowStart: Date
     let windowEnd: Date
     let points: [UsagePoint]
+    var totalTokens: Int? = nil
 }
 
 struct UsagePoint: Codable, Identifiable, Equatable {

@@ -4,6 +4,7 @@ import Charts
 struct UsageTrendChart: View {
     let points: [UsagePoint]
     var selectedTimeRange: TimeRange = .day
+    var totalTokens: Int? = nil
     var isLoading: Bool = false
     var errorMessage: String? = nil
     var onTimeRangeChange: ((TimeRange) -> Void)?
@@ -12,9 +13,16 @@ struct UsageTrendChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("用量趋势")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("用量趋势")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    if let total = totalTokens {
+                        Text("总计 \(Self.formatTokenCount(total)) tokens")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 Spacer()
                 timeRangePicker
             }

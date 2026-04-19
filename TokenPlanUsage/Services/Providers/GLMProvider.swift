@@ -155,7 +155,7 @@ class GLMProvider: TokenProvider {
             return UsagePoint(time: date, count: count)
         }
 
-        return UsageDistribution(providerId: id, windowStart: windowStart, windowEnd: windowEnd, points: points)
+        return UsageDistribution(providerId: id, windowStart: windowStart, windowEnd: windowEnd, points: points, totalTokens: response.data?.totalUsage?.totalTokensUsage)
     }
 
     private func formatDate(_ date: Date) -> String {

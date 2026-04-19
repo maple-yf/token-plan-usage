@@ -82,6 +82,7 @@ private struct MonitorProviderView: View {
                         UsageTrendChart(
                             points: distribution.points,
                             selectedTimeRange: viewModel.selectedTimeRange,
+                            totalTokens: distribution.totalTokens,
                             isLoading: viewModel.isDistributionLoading,
                             errorMessage: viewModel.distributionErrorMessage,
                             onTimeRangeChange: { range in
