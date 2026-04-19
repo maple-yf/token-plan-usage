@@ -60,10 +60,11 @@ struct UsageTrendChart: View {
         .frame(height: 160)
     }
 
-    /// Smart unit: K / M / G / B
+    /// Smart unit: K / M / G / T
     private static func formatTokenCount(_ count: Int) -> String {
         let thresholds: [(divisor: Double, suffix: String)] = [
-            (1_000_000_000.0, "B"),
+            (1_000_000_000_000.0, "T"),
+            (1_000_000_000.0, "G"),
             (1_000_000.0, "M"),
             (1_000.0, "K"),
         ]
