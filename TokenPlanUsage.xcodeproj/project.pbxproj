@@ -14,6 +14,7 @@
 		2D8ACACF2E9C3AC8FC9DF6A2 /* APIStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */; };
 		2E285A6EF1ED732029669D1F /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754A5E409DAC12F47247B5A1 /* SharedStore.swift */; };
 		329F76B122B5497AD8D35CF4 /* TokenPlanUsageWidgetEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */; };
+		350D6552CBB9E8740B8ACE4F /* TokenPlanUsageWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3861703F806CF95C870126E7 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754A5E409DAC12F47247B5A1 /* SharedStore.swift */; };
 		406B5FE071FB7FBD3D2C60AC /* UsageSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08CE64554A1CD9C6BB632C1 /* UsageSnapshot.swift */; };
 		573EC7D6E33C2BB264AE8997 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2262FF4DAC175BB21F4D76BB /* MainTabView.swift */; };
@@ -54,6 +55,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A83A3F4F609A7BADA32A0837 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE86602E2029B2F85B844326 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E2DC38F74E6FEF2BBCDE3DD8;
+			remoteInfo = TokenPlanUsageWidget;
+		};
 		DDE0D044ED4CBD79A4CA8393 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BE86602E2029B2F85B844326 /* Project object */;
@@ -63,18 +71,33 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		240B4A068563DC0EEA8FF818 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				350D6552CBB9E8740B8ACE4F /* TokenPlanUsageWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		122DE4AACB55470317939C26 /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
 		16DB17BE0245753E27416C4C /* TokenPlanUsageWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsageWidget.entitlements; sourceTree = "<group>"; };
 		17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProviderTests.swift; sourceTree = "<group>"; };
 		2262FF4DAC175BB21F4D76BB /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		23192A5F3BA94C6CB58EE9AE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		26F6E237857FCB78F5CC27BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2856DE82D16E4064858728D6 /* MonitorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorViewModel.swift; sourceTree = "<group>"; };
 		2A15F503173370A66249088B /* RingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingProgressView.swift; sourceTree = "<group>"; };
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidgetEntryView.swift; sourceTree = "<group>"; };
-		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 		3F0C4F50F1D053067224EC39 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
 		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -288,6 +311,7 @@
 		D99FEDCE66B7B0578922D0BC /* TokenPlanUsageWidget */ = {
 			isa = PBXGroup;
 			children = (
+				26F6E237857FCB78F5CC27BA /* Info.plist */,
 				16DB17BE0245753E27416C4C /* TokenPlanUsageWidget.entitlements */,
 				F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */,
 				3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */,
@@ -344,10 +368,12 @@
 			buildPhases = (
 				99B389BFF93B6D9502214CD5 /* Sources */,
 				99CFD749AE818C5D91C4FA3B /* Resources */,
+				240B4A068563DC0EEA8FF818 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				22B9DDAE0CACD2549A4012DB /* PBXTargetDependency */,
 			);
 			name = TokenPlanUsage;
 			packageProductDependencies = (
@@ -384,6 +410,9 @@
 				LastUpgradeCheck = "^16";
 				TargetAttributes = {
 					8F8C55C1B1E00C1CF99F17D8 = {
+						DevelopmentTeam = "";
+					};
+					D26060D0B85A84F26C8E773B = {
 						DevelopmentTeam = "";
 					};
 					E2DC38F74E6FEF2BBCDE3DD8 = {
@@ -489,6 +518,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		22B9DDAE0CACD2549A4012DB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E2DC38F74E6FEF2BBCDE3DD8 /* TokenPlanUsageWidget */;
+			targetProxy = A83A3F4F609A7BADA32A0837 /* PBXContainerItemProxy */;
+		};
 		907FAA6CEEB83EC847B25E97 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D26060D0B85A84F26C8E773B /* TokenPlanUsage */;
@@ -505,7 +539,6 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -530,6 +563,7 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
 				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.widgetkit-extension\"]";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -538,7 +572,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsage.TokenPlanUsageWidget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -551,6 +585,7 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
 				INFOPLIST_KEY_NSExtension = "[\"NSExtensionPointIdentifier\": \"com.apple.widgetkit-extension\"]";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -559,7 +594,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsageWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tokenplan.TokenPlanUsage.TokenPlanUsageWidget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -630,7 +665,6 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

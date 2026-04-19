@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var viewModel = SettingsViewModel()
     @State private var selectedRefreshInterval: TimeInterval = 300
-    @State private var selectedWidgetProvider = "minimax"
+    @State private var selectedWidgetProvider = SharedStore.shared.loadWidgetProvider()
 
     private let refreshOptions: [(String, TimeInterval)] = [
         ("5分钟", 300),
@@ -46,6 +46,9 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .onChange(of: selectedWidgetProvider) { _, newValue in
+                        SharedStore.shared.saveWidgetProvider(newValue)
+                    }
                 }
                 .padding()
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))

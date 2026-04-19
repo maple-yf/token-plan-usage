@@ -44,8 +44,12 @@ struct TokenUsageProvider: TimelineProvider {
 
     private func loadSnapshot() -> UsageSnapshot? {
         let sharedStore = SharedStore.shared
+        let selectedProvider = sharedStore.loadWidgetProvider()
+        // Use the user-selected provider, fallback to the most recently fetched
+        if let snapshot = sharedStore.loadSnapshot(providerId: selectedProvider) {
+            return snapshot
+        }
         let providers = ["minimax", "glm"]
-        // Load the most recently fetched snapshot across providers
         return providers.compactMap { sharedStore.loadSnapshot(providerId: $0) }
             .sorted { $0.fetchedAt > $1.fetchedAt }
             .first

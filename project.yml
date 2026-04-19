@@ -17,6 +17,8 @@ targets:
     platform: iOS
     sources:
       - TokenPlanUsage
+    dependencies:
+      - target: TokenPlanUsageWidget
     settings:
       base:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
@@ -57,13 +59,18 @@ targets:
       - path: TokenPlanUsageWidget
       - path: TokenPlanUsage/Models
       - path: TokenPlanUsage/Services/SharedStore.swift
+    info:
+      path: TokenPlanUsageWidget/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
     dependencies:
       - sdk: WidgetKit.framework
       - sdk: SwiftUI.framework
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsageWidget
+        PRODUCT_BUNDLE_IDENTIFIER: com.tokenplan.TokenPlanUsage.TokenPlanUsageWidget
         INFOPLIST_KEY_CFBundleDisplayName: "Token Usage Widget"
         INFOPLIST_KEY_NSExtension: {
           NSExtensionPointIdentifier: "com.apple.widgetkit-extension"

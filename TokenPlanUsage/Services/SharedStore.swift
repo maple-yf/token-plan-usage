@@ -32,4 +32,13 @@ class SharedStore {
         }
         return try? JSONDecoder().decode(UsageDistribution.self, from: data)
     }
+
+    func saveWidgetProvider(_ providerId: String) {
+        sharedDefaults.set(providerId, forKey: "SelectedWidgetProvider")
+        sharedDefaults.synchronize()
+    }
+
+    func loadWidgetProvider() -> String {
+        sharedDefaults.string(forKey: "SelectedWidgetProvider") ?? "minimax"
+    }
 }
