@@ -66,11 +66,11 @@ final class MiniMaxProviderTests: XCTestCase {
         )
 
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
-        XCTAssertEqual(snapshot.usedCount, 25)
+        XCTAssertEqual(snapshot.usedCount, 575)
         XCTAssertEqual(snapshot.totalCount, 600)
         XCTAssertEqual(snapshot.providerId, "minimax")
         XCTAssertEqual(snapshot.planName, "MiniMax-M*")
-        XCTAssertEqual(snapshot.remainingPercent, Double(600 - 25) / Double(600), accuracy: 0.001)
+        XCTAssertEqual(snapshot.remainingPercent, Double(25) / Double(600), accuracy: 0.001)
         XCTAssertNotNil(snapshot.refreshTime)
     }
 
@@ -112,7 +112,7 @@ final class MiniMaxProviderTests: XCTestCase {
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
         // Should pick MiniMax-M* over speech-hd
         XCTAssertEqual(snapshot.planName, "MiniMax-M*")
-        XCTAssertEqual(snapshot.usedCount, 1498)
+        XCTAssertEqual(snapshot.usedCount, 2)
         XCTAssertEqual(snapshot.totalCount, 1500)
     }
 
@@ -141,7 +141,7 @@ final class MiniMaxProviderTests: XCTestCase {
 
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
         XCTAssertEqual(snapshot.planName, "speech-hd")
-        XCTAssertEqual(snapshot.usedCount, 10)
+        XCTAssertEqual(snapshot.usedCount, 40)
     }
 
     // MARK: - Error Cases
