@@ -28,6 +28,11 @@ final class MonitorViewModelTests: XCTestCase {
     }
 
     func testRefreshUpdatesSnapshot() async throws {
+        do {
+            try KeychainService.shared.save(mockConfig)
+        } catch KeychainService.KeychainError.additionFailed {
+            throw XCTSkip("Keychain unavailable in test runner")
+        }
         await vm.refresh()
         XCTAssertNotNil(vm.snapshot)
         XCTAssertEqual(vm.snapshot?.usedCount, 10)
@@ -36,7 +41,12 @@ final class MonitorViewModelTests: XCTestCase {
         XCTAssertNil(vm.errorMessage)
     }
 
-    func testRefreshSetsErrorState() async {
+    func testRefreshSetsErrorState() async throws {
+        do {
+            try KeychainService.shared.save(mockConfig)
+        } catch KeychainService.KeychainError.additionFailed {
+            throw XCTSkip("Keychain unavailable in test runner")
+        }
         mockProvider.shouldThrow = true
         await vm.refresh()
         XCTAssertNotNil(vm.errorMessage)
@@ -44,6 +54,11 @@ final class MonitorViewModelTests: XCTestCase {
     }
 
     func testRefreshPersistsToSharedStore() async throws {
+        do {
+            try KeychainService.shared.save(mockConfig)
+        } catch KeychainService.KeychainError.additionFailed {
+            throw XCTSkip("Keychain unavailable in test runner")
+        }
         await vm.refresh()
 
         let loaded = SharedStore.shared.loadSnapshot(providerId: "mock")
