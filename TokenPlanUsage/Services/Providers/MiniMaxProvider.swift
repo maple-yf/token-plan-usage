@@ -27,7 +27,7 @@ class MiniMaxProvider: TokenProvider {
         return try parseUsageResponse(data)
     }
 
-    func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution {
+    func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange) async throws -> UsageDistribution {
         // MiniMax API does not provide historical distribution data
         return UsageDistribution(
             providerId: id,

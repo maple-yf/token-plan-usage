@@ -3,12 +3,18 @@ import Charts
 
 struct UsageTrendChart: View {
     let points: [UsagePoint]
+    var selectedTimeRange: TimeRange = .day
+    var onTimeRangeChange: ((TimeRange) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("用量趋势")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
+            HStack {
+                Text("用量趋势")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Spacer()
+                timeRangePicker
+            }
 
             if points.isEmpty {
                 emptyState
@@ -19,6 +25,30 @@ struct UsageTrendChart: View {
         .padding()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("用量趋势图表，共 \(points.count) 个数据点")
+    }
+
+    private var timeRangePicker: some View {
+        HStack(spacing: 0) {
+            ForEach(TimeRange.allCases) { range in
+                Button {
+                    onTimeRangeChange?(range)
+                } label: {
+                    Text(range.rawValue)
+                        .font(.caption2.weight(selectedTimeRange == range ? .semibold : .regular))
+                        .foregroundStyle(selectedTimeRange == range ? .primary : .secondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            selectedTimeRange == range
+                                ? AnyShapeStyle(.ultraThinMaterial)
+                                : AnyShapeStyle(.clear)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+        }
+        .padding(3)
+        .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var chartContent: some View {
@@ -41,7 +71,7 @@ struct UsageTrendChart: View {
             AxisMarks(values: xAxisValues) { value in
                 AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
                     .foregroundStyle(.quaternary)
-                AxisValueLabel(format: .dateTime.hour().minute())
+                AxisValueLabel(format: xAxisDateFormat)
                     .font(.caption2)
             }
         }
@@ -58,6 +88,18 @@ struct UsageTrendChart: View {
             }
         }
         .frame(height: 160)
+    }
+
+    /// Adaptive date format based on selected time range
+    private var xAxisDateFormat: Date.FormatStyle {
+        switch selectedTimeRange {
+        case .day:
+            return .dateTime.hour().minute()
+        case .week:
+            return .dateTime.weekday(.abbreviated).day()
+        case .month:
+            return .dateTime.month(.abbreviated).day()
+        }
     }
 
     /// Smart unit: K / M / G / T

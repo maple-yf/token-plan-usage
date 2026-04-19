@@ -14,7 +14,7 @@ final class MockTokenProvider: TokenProvider {
         return mockSnapshot!
     }
 
-    func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution {
+    func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
         if shouldThrow { throw TokenProviderError.networkUnavailable }
         return mockDistribution!
     }
@@ -56,7 +56,7 @@ final class MockTokenProviderTests: XCTestCase {
             windowEnd: Date(timeIntervalSince1970: 3600),
             points: [UsagePoint(time: Date(timeIntervalSince1970: 0), count: 5)]
         )
-        let result = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+        let result = try await provider.fetchDistribution(apiKey: "test", baseURL: nil, timeRange: .day)
         XCTAssertEqual(result.points.count, 1)
         XCTAssertEqual(result.points[0].count, 5)
     }
@@ -65,7 +65,7 @@ final class MockTokenProviderTests: XCTestCase {
         let provider = MockTokenProvider()
         provider.shouldThrow = true
         do {
-            _ = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+            _ = try await provider.fetchDistribution(apiKey: "test", baseURL: nil, timeRange: .day)
             XCTFail("Should have thrown")
         } catch TokenProviderError.networkUnavailable {
             // expected

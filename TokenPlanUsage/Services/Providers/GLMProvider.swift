@@ -60,27 +60,27 @@ class GLMProvider: TokenProvider {
         )
     }
 
-    func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution {
+    func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
         // Use cached distribution from fetchUsage if available
         if let cached = cachedDistribution { return cached }
 
         // Otherwise fetch independently
         let base = baseURL ?? defaultBaseURL
-        let modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey)
+        let modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey, timeRange: timeRange)
 
         let now = Date()
         let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+        let startDate = calendar.date(byAdding: .day, value: -timeRange.days, to: now) ?? now
 
         return buildDistribution(from: modelUsage, windowStart: startDate, windowEnd: now)
     }
 
     // MARK: - Private
 
-    private func fetchModelUsage(base: String, apiKey: String) async throws -> GLMModelUsageResponse {
+    private func fetchModelUsage(base: String, apiKey: String, timeRange: TimeRange = .day) async throws -> GLMModelUsageResponse {
         let now = Date()
         let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+        let startDate = calendar.date(byAdding: .day, value: -timeRange.days, to: now) ?? now
 
         let startTime = formatDate(startDate)
         let endTime = formatDate(now)

@@ -6,7 +6,7 @@ protocol TokenProvider {
     var defaultBaseURL: String { get }
 
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot
-    func fetchDistribution(apiKey: String, baseURL: String?) async throws -> UsageDistribution
+    func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange) async throws -> UsageDistribution
 }
 
 enum TokenProviderError: LocalizedError {

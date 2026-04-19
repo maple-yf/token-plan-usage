@@ -82,7 +82,7 @@ final class GLMProviderTests: XCTestCase {
 
         // fetchUsage caches the distribution from the same response
         _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
-        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil, timeRange: .day)
         XCTAssertEqual(distribution.providerId, "glm")
         XCTAssertEqual(distribution.points.count, 3)
         XCTAssertEqual(distribution.points[0].count, 1033418)
@@ -96,7 +96,7 @@ final class GLMProviderTests: XCTestCase {
         mockSuccess(json: json)
 
         _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
-        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil)
+        let distribution = try await provider.fetchDistribution(apiKey: "test", baseURL: nil, timeRange: .day)
         XCTAssertEqual(distribution.points.count, 0)
     }
 

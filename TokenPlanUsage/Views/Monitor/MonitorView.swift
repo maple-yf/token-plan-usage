@@ -79,8 +79,15 @@ private struct MonitorProviderView: View {
 
                     // Trend chart (skip for MiniMax — no historical data)
                     if let distribution = viewModel.distribution, !distribution.points.isEmpty {
-                        UsageTrendChart(points: distribution.points)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        UsageTrendChart(
+                            points: distribution.points,
+                            selectedTimeRange: viewModel.selectedTimeRange,
+                            onTimeRangeChange: { range in
+                                viewModel.selectedTimeRange = range
+                                Task { await viewModel.refreshDistribution() }
+                            }
+                        )
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
                 } else if viewModel.errorMessage != nil {
                     errorOverlay
