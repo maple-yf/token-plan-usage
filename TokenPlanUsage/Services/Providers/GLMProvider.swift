@@ -61,8 +61,8 @@ class GLMProvider: TokenProvider {
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
-        // Use cached distribution from fetchUsage if available
-        if let cached = cachedDistribution { return cached }
+        // Use cached distribution from fetchUsage if available (only matches 24h)
+        if timeRange == .day, let cached = cachedDistribution { return cached }
 
         // Otherwise fetch independently
         let base = baseURL ?? defaultBaseURL
@@ -144,11 +144,14 @@ class GLMProvider: TokenProvider {
             return UsageDistribution(providerId: id, windowStart: windowStart, windowEnd: windowEnd, points: [])
         }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let hourlyFormatter = DateFormatter()
+        hourlyFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let dailyFormatter = DateFormatter()
+        dailyFormatter.dateFormat = "yyyy-MM-dd"
 
         let points = zip(xTime, tokensUsage).compactMap { timeStr, count -> UsagePoint? in
-            guard let date = formatter.date(from: timeStr) else { return nil }
+            let trimmed = timeStr.trimmingCharacters(in: .whitespaces)
+            guard let date = hourlyFormatter.date(from: trimmed) ?? dailyFormatter.date(from: trimmed) else { return nil }
             return UsagePoint(time: date, count: count)
         }
 

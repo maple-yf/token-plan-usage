@@ -78,7 +78,7 @@ private struct MonitorProviderView: View {
                     }
 
                     // Trend chart (skip for MiniMax — no historical data)
-                    if let distribution = viewModel.distribution, !distribution.points.isEmpty {
+                    if let distribution = viewModel.distribution {
                         UsageTrendChart(
                             points: distribution.points,
                             selectedTimeRange: viewModel.selectedTimeRange,
