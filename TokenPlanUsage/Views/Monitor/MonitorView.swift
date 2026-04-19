@@ -82,8 +82,13 @@ private struct MonitorProviderView: View {
                         UsageTrendChart(
                             points: distribution.points,
                             selectedTimeRange: viewModel.selectedTimeRange,
+                            isLoading: viewModel.isDistributionLoading,
+                            errorMessage: viewModel.distributionErrorMessage,
                             onTimeRangeChange: { range in
                                 viewModel.selectedTimeRange = range
+                                Task { await viewModel.refreshDistribution() }
+                            },
+                            onRetry: {
                                 Task { await viewModel.refreshDistribution() }
                             }
                         )

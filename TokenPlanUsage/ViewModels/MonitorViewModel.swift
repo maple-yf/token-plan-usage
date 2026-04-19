@@ -7,6 +7,8 @@ class MonitorViewModel {
     var isLoading = false
     var errorMessage: String?
     var selectedTimeRange: TimeRange = .day
+    var isDistributionLoading = false
+    var distributionErrorMessage: String?
 
     private let provider: TokenProvider
     private let sharedStore = SharedStore.shared
@@ -52,11 +54,14 @@ class MonitorViewModel {
     func refreshDistribution() async {
         guard let config = KeychainService.shared.load(providerId: provider.id),
               !config.apiKey.isEmpty else { return }
+        isDistributionLoading = true
+        distributionErrorMessage = nil
+        defer { isDistributionLoading = false }
         do {
             distribution = try await provider.fetchDistribution(apiKey: config.apiKey, baseURL: config.baseURL, timeRange: selectedTimeRange)
             if let distribution { sharedStore.save(distribution: distribution) }
         } catch {
-            // Silently fail — snapshot is still valid
+            distributionErrorMessage = error.localizedDescription
         }
     }
 }

@@ -4,7 +4,10 @@ import Charts
 struct UsageTrendChart: View {
     let points: [UsagePoint]
     var selectedTimeRange: TimeRange = .day
+    var isLoading: Bool = false
+    var errorMessage: String? = nil
     var onTimeRangeChange: ((TimeRange) -> Void)?
+    var onRetry: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -16,7 +19,11 @@ struct UsageTrendChart: View {
                 timeRangePicker
             }
 
-            if points.isEmpty {
+            if isLoading {
+                loadingState
+            } else if errorMessage != nil {
+                errorState
+            } else if points.isEmpty {
                 emptyState
             } else {
                 chartContent
@@ -147,6 +154,38 @@ struct UsageTrendChart: View {
                         .foregroundStyle(.secondary)
                 }
                 .accessibilityLabel("暂无趋势数据")
+            }
+    }
+
+    private var loadingState: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(.quaternary)
+            .frame(height: 160)
+            .overlay {
+                ProgressView()
+                    .tint(.secondary)
+            }
+    }
+
+    private var errorState: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(.quaternary)
+            .frame(height: 160)
+            .overlay {
+                VStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                    Text("加载失败")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("重试") {
+                        onRetry?()
+                    }
+                    .font(.caption)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
             }
     }
 }
