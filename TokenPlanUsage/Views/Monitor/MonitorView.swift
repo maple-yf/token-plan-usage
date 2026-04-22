@@ -36,9 +36,11 @@ struct MonitorView: View {
 
 private struct MonitorProviderView: View {
     @State private var viewModel: MonitorViewModel
+    private let isGLM: Bool
 
     init(provider: TokenProvider, config: ProviderConfig) {
         _viewModel = State(wrappedValue: MonitorViewModel(provider: provider, config: config))
+        self.isGLM = provider.id == "glm"
     }
 
     var body: some View {
@@ -77,8 +79,8 @@ private struct MonitorProviderView: View {
                         MiniMaxModelsView(quotas: modelQuotas)
                     }
 
-                    // Trend chart (skip for MiniMax — no historical data)
-                    if let distribution = viewModel.distribution {
+                    // Trend chart (GLM only)
+                    if isGLM, let distribution = viewModel.distribution {
                         UsageTrendChart(
                             points: distribution.points,
                             selectedTimeRange: viewModel.selectedTimeRange,
