@@ -126,7 +126,7 @@
 		D1092D257E40A8BCDC3D5ADF /* ProviderConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfigView.swift; sourceTree = "<group>"; };
 		D29605819F561127FBA8538E /* UsageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDetailView.swift; sourceTree = "<group>"; };
 		D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIStatus.swift; sourceTree = "<group>"; };
-		D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TokenPlanUsageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TokenPlanUsageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB05137FA96DC41F6E9696B2 /* TokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenProvider.swift; sourceTree = "<group>"; };
 		E1E84DA6EAE3E78ECE3C83BB /* TokenPlanUsage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsage.entitlements; sourceTree = "<group>"; };
 		F04D5819BB78872DD4C2649E /* TokenPlanUsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageApp.swift; sourceTree = "<group>"; };
@@ -408,11 +408,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = "^16";
-				TargetAttributes = {
-					8F8C55C1B1E00C1CF99F17D8 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = E88327032F2441FBA64A6614 /* Build configuration list for PBXProject "TokenPlanUsage" */;
 			developmentRegion = en;
@@ -748,6 +743,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -765,6 +761,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
