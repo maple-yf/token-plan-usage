@@ -41,4 +41,31 @@ class SharedStore {
     func loadWidgetProvider() -> String {
         sharedDefaults.string(forKey: "SelectedWidgetProvider") ?? "minimax"
     }
+
+    // MARK: - Visible Providers (for Monitor tab)
+
+    private let visibleProvidersKey = "VisibleProviderIds"
+
+    func saveVisibleProviderIds(_ ids: [String]) {
+        sharedDefaults.set(ids, forKey: visibleProvidersKey)
+        sharedDefaults.synchronize()
+    }
+
+    func loadVisibleProviderIds() -> [String] {
+        sharedDefaults.stringArray(forKey: visibleProvidersKey) ?? ["minimax", "glm"]
+    }
+
+    func toggleProviderVisibility(_ providerId: String) {
+        var ids = loadVisibleProviderIds()
+        if ids.contains(providerId) {
+            ids.removeAll { $0 == providerId }
+        } else {
+            ids.append(providerId)
+        }
+        saveVisibleProviderIds(ids)
+    }
+
+    func isProviderVisible(_ providerId: String) -> Bool {
+        loadVisibleProviderIds().contains(providerId)
+    }
 }

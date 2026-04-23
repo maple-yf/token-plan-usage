@@ -3,7 +3,7 @@ import SwiftUI
 struct MonitorView: View {
     @State private var selectedProviderIndex = 0
 
-    private let providers: [(name: String, provider: TokenProvider, config: ProviderConfig)] = {
+    private let allProviders: [(name: String, provider: TokenProvider, config: ProviderConfig)] = {
         let minimaxProvider = MiniMaxProvider()
         let glmProvider = GLMProvider()
         let minimaxConfig = KeychainService.shared.load(providerId: "minimax") ?? ProviderConfig.minimax
@@ -13,6 +13,11 @@ struct MonitorView: View {
             ("GLM", glmProvider, glmConfig)
         ]
     }()
+
+    private var providers: [(name: String, provider: TokenProvider, config: ProviderConfig)] {
+        let visibleIds = SharedStore.shared.loadVisibleProviderIds()
+        return allProviders.filter { visibleIds.contains($0.provider.id) }
+    }
 
     var body: some View {
         let current = providers[selectedProviderIndex]

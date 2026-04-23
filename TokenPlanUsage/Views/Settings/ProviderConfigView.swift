@@ -75,8 +75,9 @@ struct ProviderConfigView: View {
         .onChange(of: config.apiKey) { _, _ in
             try? KeychainService.shared.save(config)
         }
-        .onChange(of: config.isEnabled) { _, _ in
+        .onChange(of: config.isEnabled) { _, isEnabled in
             try? KeychainService.shared.save(config)
+            SharedStore.shared.toggleProviderVisibility(config.id)
         }
         .onChange(of: config.baseURL) { _, _ in
             try? KeychainService.shared.save(config)
