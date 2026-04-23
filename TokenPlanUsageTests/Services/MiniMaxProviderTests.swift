@@ -3,18 +3,29 @@ import XCTest
 
 class MockURLProtocol: URLProtocol {
     static var mockResponse: (data: Data?, response: HTTPURLResponse?, error: Error?)
+    static var requestHandler: ((URLRequest) -> (data: Data, response: HTTPURLResponse, error: Error?))?
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
-        if let error = Self.mockResponse.error {
-            client?.urlProtocol(self, didFailWithError: error)
-        } else {
-            if let response = Self.mockResponse.response {
-                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        if let handler = Self.requestHandler {
+            let result = handler(request)
+            if let error = result.error {
+                client?.urlProtocol(self, didFailWithError: error)
+            } else {
+                client?.urlProtocol(self, didReceive: result.response, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didLoad: result.data)
             }
-            if let data = Self.mockResponse.data {
-                client?.urlProtocol(self, didLoad: data)
+        } else {
+            if let error = Self.mockResponse.error {
+                client?.urlProtocol(self, didFailWithError: error)
+            } else {
+                if let response = Self.mockResponse.response {
+                    client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+                }
+                if let data = Self.mockResponse.data {
+                    client?.urlProtocol(self, didLoad: data)
+                }
             }
         }
         client?.urlProtocolDidFinishLoading(self)

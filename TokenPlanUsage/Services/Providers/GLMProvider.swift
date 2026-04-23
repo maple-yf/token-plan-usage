@@ -12,12 +12,17 @@ class GLMProvider: TokenProvider {
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
         let base = baseURL ?? defaultBaseURL
 
-        // Fetch model usage and quota limit in parallel
-        async let modelUsageTask = fetchModelUsage(base: base, apiKey: apiKey)
-        async let quotaTask = fetchQuotaLimit(base: base, apiKey: apiKey)
+        // Fetch model usage first — this is the primary data source and must succeed.
+        // Quota limit is secondary; if it fails, model usage result is still valid.
+        let modelUsage: GLMModelUsageResponse
+        do {
+            modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey)
+        } catch {
+            throw error
+        }
 
-        let modelUsage = try await modelUsageTask
-        let quota: GLMQuotaLimitResponse? = (try? await quotaTask)
+        // Fetch quota limit in background — failure is OK
+        let quota: GLMQuotaLimitResponse? = try? await fetchQuotaLimit(base: base, apiKey: apiKey)
 
         // Extract data from model usage
         let totalUsage = modelUsage.data?.totalUsage

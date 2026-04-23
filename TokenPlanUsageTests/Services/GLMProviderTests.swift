@@ -5,28 +5,33 @@ final class GLMProviderTests: XCTestCase {
     var provider: GLMProvider!
     var session: URLSession!
 
-    override func setUp() {
-        provider = GLMProvider()
+    private var freshProvider: GLMProvider {
+        let p = GLMProvider()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
-        session = URLSession(configuration: config)
-        provider.urlSession = session
+        p.urlSession = URLSession(configuration: config)
+        return p
+    }
+
+    override func setUp() {
+        provider = freshProvider
     }
 
     override func tearDown() {
-        MockURLProtocol.mockResponse = (data: nil, response: nil, error: nil)
+        MockURLProtocol.requestHandler = nil
     }
 
     // MARK: - Mock Helpers
 
     private func mockSuccess(json: String, url: String = "https://api.z.ai/api/monitor/usage/model-usage") {
-        // Build query params for model-usage URL
-        let fullURL = url.contains("?") ? url : url + "?startTime=2026-04-11%2000:00:00&endTime=2026-04-12%2023:59:59"
-        MockURLProtocol.mockResponse = (
-            data: json.data(using: .utf8),
-            response: HTTPURLResponse(url: URL(string: fullURL)!, statusCode: 200, httpVersion: nil, headerFields: nil),
-            error: nil
-        )
+        MockURLProtocol.requestHandler = { request in
+            let urlString = request.url?.absoluteString ?? ""
+            let (data, response) = (
+                json.data(using: .utf8)!,
+                HTTPURLResponse(url: URL(string: urlString)!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            )
+            return (data: data, response: response, error: nil)
+        }
     }
 
     // MARK: - Success Cases
