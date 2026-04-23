@@ -12,35 +12,17 @@ class GLMProvider: TokenProvider {
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
         let base = baseURL ?? defaultBaseURL
 
-        // Fetch model usage first — this is the primary data source and must succeed.
-        // Quota limit is secondary; if it fails, model usage result is still valid.
-        let modelUsage: GLMModelUsageResponse
-        do {
-            modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey)
-        } catch {
-            throw error
-        }
-
-        // Fetch quota limit in background — failure is OK
-        let quota: GLMQuotaLimitResponse? = try? await fetchQuotaLimit(base: base, apiKey: apiKey)
+        // Fetch model usage only — quota is fetched separately in Settings and not
+        // needed for the Monitor tab's core functionality (snapshot + distribution).
+        let modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey)
 
         // Extract data from model usage
         let totalUsage = modelUsage.data?.totalUsage
 
-        // TOKENS_LIMIT: model token usage — only has percentage + nextResetTime, no counts
-        let tokensLimit = quota?.data?.limits?.first(where: { $0.type == "TOKENS_LIMIT" })
-        let tokensPercentage = tokensLimit?.percentage ?? 0
-        let nextResetTime = tokensLimit?.nextResetTime.map { Date(timeIntervalSince1970: $0 / 1000) }
-
-        // TIME_LIMIT: MCP tool usage — usage(total), currentValue(used), remaining
-        let timeLimit = quota?.data?.limits?.first(where: { $0.type == "TIME_LIMIT" })
-        let mcpQuota = timeLimit.map {
-            MCPQuota(
-                usedCount: $0.currentValue ?? 0,
-                totalCount: $0.usage ?? 0,
-                remainingCount: $0.remaining ?? 0
-            )
-        }
+        // TOKENS_LIMIT and TIME_LIMIT: fetched separately via fetchQuotaLimit (not in fetchUsage)
+        let tokensPercentage = 0
+        let nextResetTime: Date? = nil
+        let mcpQuota: MCPQuota? = nil
 
         // Build plan name from models
         let modelNames = totalUsage?.modelSummaryList?.map { $0.modelName ?? "" }.joined(separator: " + ") ?? "GLM"
