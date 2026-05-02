@@ -6,11 +6,14 @@ struct MonitorView: View {
     private let allProviders: [(name: String, provider: TokenProvider, config: ProviderConfig)] = {
         let minimaxProvider = MiniMaxProvider()
         let glmProvider = GLMProvider()
+        let deepseekProvider = DeepSeekProvider()
         let minimaxConfig = KeychainService.shared.load(providerId: "minimax") ?? ProviderConfig.minimax
         let glmConfig = KeychainService.shared.load(providerId: "glm") ?? ProviderConfig.glm
+        let deepseekConfig = KeychainService.shared.load(providerId: "deepseek") ?? ProviderConfig.deepseek
         return [
             ("MiniMax", minimaxProvider, minimaxConfig),
-            ("GLM", glmProvider, glmConfig)
+            ("GLM", glmProvider, glmConfig),
+            ("DeepSeek", deepseekProvider, deepseekConfig)
         ]
     }()
 
@@ -42,10 +45,12 @@ struct MonitorView: View {
 private struct MonitorProviderView: View {
     @State private var viewModel: MonitorViewModel
     private let isGLM: Bool
+    private let isDeepSeek: Bool
 
     init(provider: TokenProvider, config: ProviderConfig) {
         _viewModel = State(wrappedValue: MonitorViewModel(provider: provider, config: config))
         self.isGLM = provider.id == "glm"
+        self.isDeepSeek = provider.id == "deepseek"
     }
 
     var body: some View {
@@ -55,24 +60,28 @@ private struct MonitorProviderView: View {
                     // Stale data warning
                     staleDataWarning(snapshot: snapshot)
 
-                    // Ring progress
-                    RingProgressView(
-                        progress: snapshot.remainingPercent,
-                        usedCount: snapshot.usedCount,
-                        totalCount: snapshot.totalCount,
-                        planName: snapshot.planName,
-                        remainingTimeString: formatRemainingTime(snapshot.refreshTime),
-                        onRefresh: { Task { await viewModel.refresh() } }
-                    )
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    if isDeepSeek, let balance = snapshot.balance {
+                        deepseekBalanceCard(balance)
+                    } else {
+                        // Ring progress
+                        RingProgressView(
+                            progress: snapshot.remainingPercent,
+                            usedCount: snapshot.usedCount,
+                            totalCount: snapshot.totalCount,
+                            planName: snapshot.planName,
+                            remainingTimeString: formatRemainingTime(snapshot.refreshTime),
+                            onRefresh: { Task { await viewModel.refresh() } }
+                        )
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
 
-                    // Usage detail
-                    UsageDetailView(
-                        usedCount: snapshot.usedCount,
-                        totalCount: snapshot.totalCount,
-                        remainingPercent: snapshot.remainingPercent,
-                        remainingTimeString: formatRemainingTime(snapshot.refreshTime)
-                    )
+                        // Usage detail
+                        UsageDetailView(
+                            usedCount: snapshot.usedCount,
+                            totalCount: snapshot.totalCount,
+                            remainingPercent: snapshot.remainingPercent,
+                            remainingTimeString: formatRemainingTime(snapshot.refreshTime)
+                        )
+                    }
 
                     // MCP quota (GLM only)
                     if let mcpQuota = snapshot.mcpQuota {
@@ -131,6 +140,54 @@ private struct MonitorProviderView: View {
         .task {
             await viewModel.refresh()
         }
+    }
+
+    // MARK: - DeepSeek Balance Card
+
+    private func deepseekBalanceCard(_ balance: DeepSeekBalance) -> some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 4) {
+                Image(systemName: "dollarsign.circle.fill")
+                    .foregroundStyle(.green)
+                Text("DeepSeek API")
+                    .font(.headline)
+            }
+
+            Text("\(balance.currency) \(balance.totalBalance)")
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+
+            HStack(spacing: 24) {
+                VStack(spacing: 4) {
+                    Text("赠送余额")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(balance.currency) \(balance.grantedBalance)")
+                        .font(.title3.weight(.semibold))
+                }
+
+                Divider()
+                    .frame(height: 32)
+
+                VStack(spacing: 4) {
+                    Text("充值余额")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(balance.currency) \(balance.toppedUpBalance)")
+                        .font(.title3.weight(.semibold))
+                }
+            }
+
+            Button {
+                Task { await viewModel.refresh() }
+            } label: {
+                Label("刷新", systemImage: "arrow.clockwise")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(24)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
     }
 
     // MARK: - Stale Data Warning

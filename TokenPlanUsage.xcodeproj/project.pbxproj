@@ -25,6 +25,7 @@
 		64AAD2CEA8967A818BC0D525 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3372058EA405BF4BC3C89CF2 /* ContentView.swift */; };
 		68DAE360CC5A1B2FCCEB8E6D /* TokenPlanUsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F637C81F942FD6DDA8A8E225 /* TokenPlanUsageWidget.swift */; };
 		727EF775479F3909759E2AFA /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */; };
+		729D42E7A406EB8ED229654E /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B480CAC8E8F93E8F89B36B4 /* DeepSeekProvider.swift */; };
 		74EB139DE06647BDF358401A /* UsageDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648E8CF65087F37C78E7F49B /* UsageDistribution.swift */; };
 		7CC20C7526668AB8845FD9DC /* UsageSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C87C0D151D4E5A71038E71A /* UsageSnapshotTests.swift */; };
 		7E8A55396C7DA24676CC46EE /* APIStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58CFECCA7B4B083F01D2DA4 /* APIStatus.swift */; };
@@ -94,6 +95,7 @@
 		26F6E237857FCB78F5CC27BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2856DE82D16E4064858728D6 /* MonitorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorViewModel.swift; sourceTree = "<group>"; };
 		2A15F503173370A66249088B /* RingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingProgressView.swift; sourceTree = "<group>"; };
+		2B480CAC8E8F93E8F89B36B4 /* DeepSeekProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeepSeekProvider.swift; sourceTree = "<group>"; };
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidgetEntryView.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 			children = (
 				3F0C4F50F1D053067224EC39 /* GLMProvider.swift */,
 				3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */,
+				2B480CAC8E8F93E8F89B36B4 /* DeepSeekProvider.swift */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -356,8 +359,6 @@
 				907FAA6CEEB83EC847B25E97 /* PBXTargetDependency */,
 			);
 			name = TokenPlanUsageTests;
-			packageProductDependencies = (
-			);
 			productName = TokenPlanUsageTests;
 			productReference = D8B62084D5ED07BEA37FAB4C /* TokenPlanUsageTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -376,8 +377,6 @@
 				22B9DDAE0CACD2549A4012DB /* PBXTargetDependency */,
 			);
 			name = TokenPlanUsage;
-			packageProductDependencies = (
-			);
 			productName = TokenPlanUsage;
 			productReference = 3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */;
 			productType = "com.apple.product-type.application";
@@ -394,8 +393,6 @@
 			dependencies = (
 			);
 			name = TokenPlanUsageWidget;
-			packageProductDependencies = (
-			);
 			productName = TokenPlanUsageWidget;
 			productReference = 445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -501,6 +498,7 @@
 				15305BD20CAA9E25C098BF49 /* UsageDistribution.swift in Sources */,
 				406B5FE071FB7FBD3D2C60AC /* UsageSnapshot.swift in Sources */,
 				9130CFD6E9C989791BFA3E98 /* UsageTrendChart.swift in Sources */,
+				729D42E7A406EB8ED229654E /* DeepSeekProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

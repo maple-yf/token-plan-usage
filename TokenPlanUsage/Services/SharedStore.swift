@@ -52,7 +52,7 @@ class SharedStore {
     }
 
     func loadVisibleProviderIds() -> [String] {
-        sharedDefaults.stringArray(forKey: visibleProvidersKey) ?? ["minimax", "glm"]
+        sharedDefaults.stringArray(forKey: visibleProvidersKey) ?? ["minimax", "glm", "deepseek"]
     }
 
     func toggleProviderVisibility(_ providerId: String) {

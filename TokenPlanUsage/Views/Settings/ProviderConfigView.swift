@@ -13,7 +13,7 @@ struct ProviderConfigView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(config.id.uppercased())
                         .font(.headline)
-                    Text(config.id == "minimax" ? "MiniMax API" : "智谱 GLM API")
+                    Text(providerDescription(config.id))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -94,6 +94,15 @@ struct ProviderConfigView: View {
         }
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func providerDescription(_ id: String) -> String {
+        switch id {
+        case "minimax": return "MiniMax API"
+        case "glm": return "智谱 GLM API"
+        case "deepseek": return "DeepSeek API"
+        default: return id.uppercased()
+        }
     }
 }
 

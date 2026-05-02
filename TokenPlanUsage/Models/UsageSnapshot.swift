@@ -11,6 +11,14 @@ struct UsageSnapshot: Codable, Equatable {
     let status: APIStatus
     let mcpQuota: MCPQuota?
     let modelQuotas: [MiniMaxModelQuota]?
+    var balance: DeepSeekBalance? = nil
+}
+
+struct DeepSeekBalance: Codable, Equatable {
+    let currency: String
+    let totalBalance: String
+    let grantedBalance: String
+    let toppedUpBalance: String
 }
 
 struct MCPQuota: Codable, Equatable {

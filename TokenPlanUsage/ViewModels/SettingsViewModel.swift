@@ -4,7 +4,8 @@ import Foundation
 class SettingsViewModel {
     var providers: [ProviderConfig] = [
         ProviderConfig.minimax,
-        ProviderConfig.glm
+        ProviderConfig.glm,
+        ProviderConfig.deepseek
     ]
     var refreshInterval: TimeInterval = 5 * 60 // 5 minutes
     var widgetProvider: String = "minimax"
@@ -23,6 +24,9 @@ class SettingsViewModel {
         }
         if let glm = keychainService.load(providerId: "glm") {
             providers[1] = glm
+        }
+        if let deepseek = keychainService.load(providerId: "deepseek") {
+            providers[2] = deepseek
         }
     }
 
