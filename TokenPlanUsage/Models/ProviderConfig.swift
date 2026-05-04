@@ -5,6 +5,8 @@ struct ProviderConfig: Codable, Identifiable, Equatable {
     var apiKey: String
     var baseURL: String?
     var isEnabled: Bool
+    var platformToken: String?
+    var platformCookie: String?
 
     static let minimax = ProviderConfig(id: "minimax", apiKey: "", baseURL: nil, isEnabled: true)
     static let glm = ProviderConfig(id: "glm", apiKey: "", baseURL: nil, isEnabled: false)

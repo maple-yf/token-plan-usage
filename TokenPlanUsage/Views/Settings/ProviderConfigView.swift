@@ -70,6 +70,56 @@ struct ProviderConfigView: View {
                             .font(.system(.subheadline, design: .monospaced))
                     }
                 }
+
+                // Platform token/cookie (DeepSeek only)
+                if config.id == "deepseek" {
+                    Divider()
+                        .background(.white.opacity(0.2))
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Platform Token")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        HStack {
+                            if showAPIKey {
+                                TextField("从 platform.deepseek.com 获取", text: Binding(
+                                    get: { config.platformToken ?? "" },
+                                    set: { config.platformToken = $0.isEmpty ? nil : $0 }
+                                ))
+                                .textFieldStyle(.roundedBorder)
+                                .font(.system(.subheadline, design: .monospaced))
+                            } else {
+                                SecureField("从 platform.deepseek.com 获取", text: Binding(
+                                    get: { config.platformToken ?? "" },
+                                    set: { config.platformToken = $0.isEmpty ? nil : $0 }
+                                ))
+                                .textFieldStyle(.roundedBorder)
+                                .font(.system(.subheadline, design: .monospaced))
+                            }
+                            Button {
+                                showAPIKey.toggle()
+                            } label: {
+                                Image(systemName: showAPIKey ? "eye.slash" : "eye")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Text("登录 platform.deepseek.com，从浏览器开发者工具中获取 Token")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Platform Cookie（可选）")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        TextField("可选，辅助认证", text: Binding(
+                            get: { config.platformCookie ?? "" },
+                            set: { config.platformCookie = $0.isEmpty ? nil : $0 }
+                        ))
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(.subheadline, design: .monospaced))
+                    }
+                }
             }
         }
         .onChange(of: config.apiKey) { _, _ in
@@ -92,6 +142,12 @@ struct ProviderConfigView: View {
                 config.baseURL = newValue.isEmpty ? nil : newValue
             }
         }
+        .onChange(of: config.platformToken) { _, _ in
+            try? KeychainService.shared.save(config)
+        }
+        .onChange(of: config.platformCookie) { _, _ in
+            try? KeychainService.shared.save(config)
+        }
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
@@ -108,7 +164,7 @@ struct ProviderConfigView: View {
 
 #Preview {
     @Previewable @State var config = ProviderConfig(
-        id: "minimax", apiKey: "sk-test-key-12345", baseURL: nil, isEnabled: true
+        id: "deepseek", apiKey: "sk-test-key-12345", baseURL: nil, isEnabled: true
     )
     ProviderConfigView(config: $config)
         .padding()
