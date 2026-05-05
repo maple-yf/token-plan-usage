@@ -23,7 +23,7 @@ class MonitorViewModel {
     func refresh() async {
         // Reload config from Keychain to pick up any changes made in Settings
         guard let config = KeychainService.shared.load(providerId: provider.id),
-              !config.apiKey.isEmpty else {
+              !config.apiKey.isEmpty || !(config.platformToken?.isEmpty ?? true) else {
             snapshot = nil
             distribution = nil
             errorMessage = nil
@@ -34,26 +34,38 @@ class MonitorViewModel {
         errorMessage = nil
         defer { isLoading = false }
 
+        // Fetch usage snapshot (requires API key)
+        if !config.apiKey.isEmpty {
+            do {
+                snapshot = try await provider.fetchUsage(apiKey: config.apiKey, baseURL: config.baseURL)
+                sharedStore.save(snapshot: snapshot!)
+            } catch TokenProviderError.invalidAPIKey {
+                errorMessage = "API Key 无效，请检查设置"
+                snapshot = nil
+            } catch {
+                // Balance fetch failure is non-fatal if platform token is available
+                if config.platformToken?.isEmpty ?? true {
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+
+        // Fetch distribution (may use platformToken internally for some providers)
         do {
-            snapshot = try await provider.fetchUsage(apiKey: config.apiKey, baseURL: config.baseURL)
             distribution = try await provider.fetchDistribution(apiKey: config.apiKey, baseURL: config.baseURL, timeRange: selectedTimeRange)
-            // Cache both snapshot and distribution
-            sharedStore.save(snapshot: snapshot!)
             if let distribution {
                 sharedStore.save(distribution: distribution)
             }
-        } catch TokenProviderError.invalidAPIKey {
-            errorMessage = "API Key 无效，请检查设置"
-            snapshot = nil
-            distribution = nil
         } catch {
-            errorMessage = error.localizedDescription
+            if errorMessage == nil {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 
     func refreshDistribution() async {
         guard let config = KeychainService.shared.load(providerId: provider.id),
-              !config.apiKey.isEmpty else { return }
+              !config.apiKey.isEmpty || !(config.platformToken?.isEmpty ?? true) else { return }
         isDistributionLoading = true
         distributionErrorMessage = nil
         defer { isDistributionLoading = false }

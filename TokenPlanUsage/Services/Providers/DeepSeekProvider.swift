@@ -76,7 +76,7 @@ class DeepSeekProvider: TokenProvider {
         let year = calendar.component(.year, from: now)
         let costResp = try await fetchPlatformCost(month: month, year: year, platformToken: platformToken, platformCookie: platformCookie)
 
-        guard let bizData = costResp.bizData, !bizData.isEmpty else {
+        guard let bizData = costResp.data?.bizData, !bizData.isEmpty else {
             return UsageDistribution(providerId: id, windowStart: windowStart, windowEnd: now, points: [])
         }
 
@@ -137,6 +137,7 @@ class DeepSeekProvider: TokenProvider {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(platformToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15", forHTTPHeaderField: "User-Agent")
         if let cookie = platformCookie, !cookie.isEmpty {
             request.setValue(cookie, forHTTPHeaderField: "Cookie")
         }
@@ -185,10 +186,17 @@ struct DeepSeekBalanceResponse: Decodable {
 // MARK: - Platform API Response Models (for usage/cost)
 
 struct DeepSeekPlatformCostResponse: Decodable {
-    let bizData: [DeepSeekPlatformCostData]?
+    let code: Int?
+    let data: DataWrapper?
 
-    enum CodingKeys: String, CodingKey {
-        case bizData = "biz_data"
+    struct DataWrapper: Decodable {
+        let bizCode: Int?
+        let bizData: [DeepSeekPlatformCostData]?
+
+        enum CodingKeys: String, CodingKey {
+            case bizCode = "biz_code"
+            case bizData = "biz_data"
+        }
     }
 }
 

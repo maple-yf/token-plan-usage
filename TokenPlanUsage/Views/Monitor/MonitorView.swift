@@ -93,23 +93,23 @@ private struct MonitorProviderView: View {
                         MiniMaxModelsView(quotas: modelQuotas)
                     }
 
-                    // Trend chart (GLM only)
-                    if isGLM, let distribution = viewModel.distribution {
-                        UsageTrendChart(
-                            points: distribution.points,
-                            selectedTimeRange: viewModel.selectedTimeRange,
-                            totalTokens: distribution.totalTokens,
-                            isLoading: viewModel.isDistributionLoading,
-                            errorMessage: viewModel.distributionErrorMessage,
-                            onTimeRangeChange: { range in
-                                viewModel.selectedTimeRange = range
-                                Task { await viewModel.refreshDistribution() }
-                            },
-                            onRetry: {
-                                Task { await viewModel.refreshDistribution() }
+                    // Trend chart
+                    if let distribution = viewModel.distribution {
+                        distributionChart(distribution)
+                    }
+                } else if let distribution = viewModel.distribution, !distribution.points.isEmpty {
+                    // Distribution-only view (e.g., DeepSeek with platform token only)
+                    VStack(spacing: 16) {
+                        if isDeepSeek {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .foregroundStyle(.blue)
+                                Text("DeepSeek 用量趋势")
+                                    .font(.headline)
                             }
-                        )
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                            .padding(.top, 8)
+                        }
+                        distributionChart(distribution)
                     }
                 } else if viewModel.errorMessage != nil {
                     errorOverlay
@@ -297,6 +297,27 @@ private struct MonitorProviderView: View {
         }
         .padding(40)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    // MARK: - Distribution Chart
+
+    @ViewBuilder
+    private func distributionChart(_ distribution: UsageDistribution) -> some View {
+        UsageTrendChart(
+            points: distribution.points,
+            selectedTimeRange: viewModel.selectedTimeRange,
+            totalTokens: distribution.totalTokens,
+            isLoading: viewModel.isDistributionLoading,
+            errorMessage: viewModel.distributionErrorMessage,
+            onTimeRangeChange: { range in
+                viewModel.selectedTimeRange = range
+                Task { await viewModel.refreshDistribution() }
+            },
+            onRetry: {
+                Task { await viewModel.refreshDistribution() }
+            }
+        )
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Helpers

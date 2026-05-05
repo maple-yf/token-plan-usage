@@ -12,6 +12,7 @@ final class SettingsViewModelTests: XCTestCase {
         // Clean up any existing keys
         try? keychainService.delete(providerId: "minimax")
         try? keychainService.delete(providerId: "glm")
+        try? keychainService.delete(providerId: "deepseek")
         vm = SettingsViewModel()
     }
 
@@ -19,15 +20,17 @@ final class SettingsViewModelTests: XCTestCase {
         try await super.tearDown()
         try? keychainService.delete(providerId: "minimax")
         try? keychainService.delete(providerId: "glm")
+        try? keychainService.delete(providerId: "deepseek")
     }
 
     // MARK: - Initial State
 
     func testInitialLoadDefaults() {
         XCTAssertNotNil(vm.providers)
-        XCTAssertEqual(vm.providers.count, 2)
+        XCTAssertEqual(vm.providers.count, 3)
         XCTAssertEqual(vm.providers[0].id, "minimax")
         XCTAssertEqual(vm.providers[1].id, "glm")
+        XCTAssertEqual(vm.providers[2].id, "deepseek")
         XCTAssertEqual(vm.refreshInterval, 300)
         XCTAssertEqual(vm.widgetProvider, "minimax")
     }
