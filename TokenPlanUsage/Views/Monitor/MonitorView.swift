@@ -54,61 +54,113 @@ private struct MonitorProviderView: View {
     }
 
     var body: some View {
+        if isDeepSeek {
+            deepSeekContent
+        } else {
+            otherProviderContent
+        }
+    }
+
+    // MARK: - DeepSeek Content
+
+    private var deepSeekContent: some View {
+        Group {
+            if let usage = viewModel.platformUsage {
+                VStack(spacing: 0) {
+                    DeepSeekUsageView(
+                        usage: usage,
+                        balance: viewModel.snapshot?.balance,
+                        isLoading: viewModel.isPlatformUsageLoading,
+                        errorMessage: viewModel.platformUsageErrorMessage,
+                        onRefresh: { Task { await viewModel.refresh() } },
+                        onMonthChange: { month, year in
+                            viewModel.onPlatformMonthChanged(month: month, year: year)
+                        }
+                    )
+
+                    StatusBarView(
+                        status: viewModel.platformUsageErrorMessage != nil ? .error(viewModel.platformUsageErrorMessage ?? "") : (viewModel.snapshot?.status ?? .normal),
+                        lastUpdated: viewModel.snapshot?.fetchedAt,
+                        isLoading: viewModel.isLoading || viewModel.isPlatformUsageLoading,
+                        onRefresh: { Task { await viewModel.refresh() } }
+                    )
+                    .padding()
+                }
+            } else if viewModel.isPlatformUsageLoading || viewModel.isLoading {
+                loadingSkeleton
+            } else if let error = viewModel.platformUsageErrorMessage {
+                VStack(spacing: 16) {
+                    errorOverlay
+                    StatusBarView(
+                        status: .error(error),
+                        lastUpdated: nil,
+                        isLoading: false,
+                        onRefresh: { Task { await viewModel.refresh() } }
+                    )
+                }
+                .padding()
+            } else if viewModel.errorMessage != nil {
+                VStack(spacing: 16) {
+                    errorOverlay
+                    StatusBarView(
+                        status: .error(viewModel.errorMessage ?? ""),
+                        lastUpdated: nil,
+                        isLoading: false,
+                        onRefresh: { Task { await viewModel.refresh() } }
+                    )
+                }
+                .padding()
+            } else {
+                noProviderState
+            }
+        }
+        .background(
+            LinearGradient(
+                colors: [.blue.opacity(0.3), .purple.opacity(0.2)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        )
+        .task {
+            await viewModel.refresh()
+        }
+    }
+
+    // MARK: - Other Provider Content
+
+    private var otherProviderContent: some View {
         ScrollView {
             VStack(spacing: 20) {
                 if let snapshot = viewModel.snapshot {
-                    // Stale data warning
                     staleDataWarning(snapshot: snapshot)
 
-                    if isDeepSeek, let balance = snapshot.balance {
-                        deepseekBalanceCard(balance)
-                    } else {
-                        // Ring progress
-                        RingProgressView(
-                            progress: snapshot.remainingPercent,
-                            usedCount: snapshot.usedCount,
-                            totalCount: snapshot.totalCount,
-                            planName: snapshot.planName,
-                            remainingTimeString: formatRemainingTime(snapshot.refreshTime),
-                            onRefresh: { Task { await viewModel.refresh() } }
-                        )
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    RingProgressView(
+                        progress: snapshot.remainingPercent,
+                        usedCount: snapshot.usedCount,
+                        totalCount: snapshot.totalCount,
+                        planName: snapshot.planName,
+                        remainingTimeString: formatRemainingTime(snapshot.refreshTime),
+                        onRefresh: { Task { await viewModel.refresh() } }
+                    )
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
 
-                        // Usage detail
-                        UsageDetailView(
-                            usedCount: snapshot.usedCount,
-                            totalCount: snapshot.totalCount,
-                            remainingPercent: snapshot.remainingPercent,
-                            remainingTimeString: formatRemainingTime(snapshot.refreshTime)
-                        )
-                    }
+                    UsageDetailView(
+                        usedCount: snapshot.usedCount,
+                        totalCount: snapshot.totalCount,
+                        remainingPercent: snapshot.remainingPercent,
+                        remainingTimeString: formatRemainingTime(snapshot.refreshTime)
+                    )
 
-                    // MCP quota (GLM only)
                     if let mcpQuota = snapshot.mcpQuota {
                         MCPQuotaView(quota: mcpQuota)
                     }
 
-                    // MiniMax model quotas
                     if let modelQuotas = snapshot.modelQuotas {
                         MiniMaxModelsView(quotas: modelQuotas)
                     }
 
-                    // Trend chart
                     if let distribution = viewModel.distribution {
-                        distributionChart(distribution)
-                    }
-                } else if let distribution = viewModel.distribution, !distribution.points.isEmpty {
-                    // Distribution-only view (e.g., DeepSeek with platform token only)
-                    VStack(spacing: 16) {
-                        if isDeepSeek {
-                            HStack(spacing: 4) {
-                                Image(systemName: "chart.line.uptrend.xyaxis")
-                                    .foregroundStyle(.blue)
-                                Text("DeepSeek 用量趋势")
-                                    .font(.headline)
-                            }
-                            .padding(.top, 8)
-                        }
                         distributionChart(distribution)
                     }
                 } else if viewModel.errorMessage != nil {
@@ -119,7 +171,6 @@ private struct MonitorProviderView: View {
                     loadingSkeleton
                 }
 
-                // Status bar
                 StatusBarView(
                     status: viewModel.errorMessage != nil ? .error(viewModel.errorMessage ?? "") : (viewModel.snapshot?.status ?? .normal),
                     lastUpdated: viewModel.snapshot?.fetchedAt,
@@ -142,60 +193,12 @@ private struct MonitorProviderView: View {
         }
     }
 
-    // MARK: - DeepSeek Balance Card
-
-    private func deepseekBalanceCard(_ balance: DeepSeekBalance) -> some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 4) {
-                Image(systemName: "dollarsign.circle.fill")
-                    .foregroundStyle(.green)
-                Text("DeepSeek API")
-                    .font(.headline)
-            }
-
-            Text("\(balance.currency) \(balance.totalBalance)")
-                .font(.system(size: 40, weight: .bold, design: .rounded))
-                .foregroundStyle(.primary)
-
-            HStack(spacing: 24) {
-                VStack(spacing: 4) {
-                    Text("赠送余额")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("\(balance.currency) \(balance.grantedBalance)")
-                        .font(.title3.weight(.semibold))
-                }
-
-                Divider()
-                    .frame(height: 32)
-
-                VStack(spacing: 4) {
-                    Text("充值余额")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("\(balance.currency) \(balance.toppedUpBalance)")
-                        .font(.title3.weight(.semibold))
-                }
-            }
-
-            Button {
-                Task { await viewModel.refresh() }
-            } label: {
-                Label("刷新", systemImage: "arrow.clockwise")
-                    .font(.subheadline)
-            }
-            .buttonStyle(.bordered)
-        }
-        .padding(24)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-    }
-
     // MARK: - Stale Data Warning
 
     @ViewBuilder
     private func staleDataWarning(snapshot: UsageSnapshot) -> some View {
         let age = Date().timeIntervalSince(snapshot.fetchedAt)
-        if age > 30 * 60 { // 30 minutes
+        if age > 30 * 60 {
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(age > 24 * 3600 ? .red : .yellow)
@@ -221,7 +224,7 @@ private struct MonitorProviderView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.largeTitle)
                 .foregroundStyle(.orange)
-            Text(viewModel.errorMessage ?? "未知错误")
+            Text(viewModel.errorMessage ?? viewModel.platformUsageErrorMessage ?? "未知错误")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -238,7 +241,6 @@ private struct MonitorProviderView: View {
 
     private var loadingSkeleton: some View {
         VStack(spacing: 20) {
-            // Skeleton ring
             Circle()
                 .stroke(Color.gray.opacity(0.2), lineWidth: 18)
                 .frame(width: 180, height: 180)
@@ -253,7 +255,6 @@ private struct MonitorProviderView: View {
                     }
                 }
 
-            // Skeleton details
             HStack(spacing: 0) {
                 skeletonDetailItem
                 skeletonDetailItem
@@ -265,6 +266,7 @@ private struct MonitorProviderView: View {
             ProgressView()
                 .padding(.top, 8)
         }
+        .padding()
     }
 
     private var skeletonDetailItem: some View {
@@ -291,7 +293,7 @@ private struct MonitorProviderView: View {
                 .foregroundStyle(.secondary)
             Text("未配置 Provider")
                 .font(.headline)
-            Text("请前往设置页面配置 API Key")
+            Text("请前往设置页面配置 API Key 和 Platform Token")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }

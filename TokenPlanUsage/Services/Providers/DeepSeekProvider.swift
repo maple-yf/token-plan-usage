@@ -59,7 +59,6 @@ class DeepSeekProvider: TokenProvider {
         let calendar = Calendar.current
         let windowStart = calendar.date(byAdding: .day, value: -timeRange.days, to: now) ?? now
 
-        // Load config to check for platform token
         let config = KeychainService.shared.load(providerId: id)
         guard let platformToken = config?.platformToken, !platformToken.isEmpty else {
             return UsageDistribution(
@@ -71,7 +70,6 @@ class DeepSeekProvider: TokenProvider {
         }
 
         let platformCookie = config?.platformCookie
-
         let month = calendar.component(.month, from: now)
         let year = calendar.component(.year, from: now)
         let costResp = try await fetchPlatformCost(month: month, year: year, platformToken: platformToken, platformCookie: platformCookie)
@@ -95,7 +93,6 @@ class DeepSeekProvider: TokenProvider {
                       date >= windowStart, date <= now,
                       let models = day.data else { continue }
 
-                // Sum all model usage amounts for this day (convert yuan to fen)
                 var dayTotal: Double = 0
                 for model in models {
                     if let items = model.usage {
@@ -107,7 +104,6 @@ class DeepSeekProvider: TokenProvider {
                     }
                 }
 
-                // Skip days with zero usage
                 if dayTotal > 0 {
                     let amountInFen = Int(dayTotal * 100)
                     points.append(UsagePoint(time: date, count: amountInFen))
@@ -124,6 +120,141 @@ class DeepSeekProvider: TokenProvider {
             windowEnd: now,
             points: points,
             totalTokens: totalTokens
+        )
+    }
+
+    // MARK: - Platform Usage (rich data)
+
+    func fetchPlatformUsage(month: Int, year: Int) async throws -> DeepSeekPlatformUsage {
+        let config = KeychainService.shared.load(providerId: id)
+        guard let platformToken = config?.platformToken, !platformToken.isEmpty else {
+            throw TokenProviderError.invalidAPIKey
+        }
+
+        let costResp = try await fetchPlatformCost(month: month, year: year, platformToken: platformToken, platformCookie: config?.platformCookie)
+
+        guard let bizData = costResp.data?.bizData, let firstData = bizData.first else {
+            throw TokenProviderError.invalidResponse
+        }
+
+        let currency = firstData.currency ?? "CNY"
+        var dailyUsage: [DeepSeekDailyUsage] = []
+        var modelTotals: [DeepSeekModelTotalUsage] = []
+
+        // Parse daily data
+        if let days = firstData.days {
+            for day in days {
+                guard let dateStr = day.date, let models = day.data else { continue }
+
+                var totalAmount: Double = 0
+                var requestCount: Double = 0
+                var cacheHitTokens: Double = 0
+                var cacheMissTokens: Double = 0
+                var outputTokens: Double = 0
+                var modelBreakdown: [DeepSeekModelDayUsage] = []
+
+                for model in models {
+                    let modelName = model.model ?? "Unknown"
+                    var mCacheHit: Double = 0
+                    var mCacheMiss: Double = 0
+                    var mOutput: Double = 0
+                    var mRequest: Double = 0
+                    var mTotal: Double = 0
+
+                    if let items = model.usage {
+                        for item in items {
+                            let amount = Double(item.amount ?? "0") ?? 0
+                            switch item.type {
+                            case "PROMPT_CACHE_HIT_TOKEN":
+                                mCacheHit += amount
+                                cacheHitTokens += amount
+                            case "PROMPT_CACHE_MISS_TOKEN":
+                                mCacheMiss += amount
+                                cacheMissTokens += amount
+                            case "RESPONSE_TOKEN":
+                                mOutput += amount
+                                outputTokens += amount
+                            case "REQUEST":
+                                mRequest += amount
+                                requestCount += amount
+                            default:
+                                break
+                            }
+                            mTotal += amount
+                            totalAmount += amount
+                        }
+                    }
+
+                    modelBreakdown.append(DeepSeekModelDayUsage(
+                        modelName: modelName,
+                        cacheHitTokens: mCacheHit,
+                        cacheMissTokens: mCacheMiss,
+                        outputTokens: mOutput,
+                        requestCount: mRequest,
+                        totalAmount: mTotal
+                    ))
+                }
+
+                dailyUsage.append(DeepSeekDailyUsage(
+                    date: dateStr,
+                    totalAmount: totalAmount,
+                    requestCount: requestCount,
+                    cacheHitTokens: cacheHitTokens,
+                    cacheMissTokens: cacheMissTokens,
+                    outputTokens: outputTokens,
+                    modelBreakdown: modelBreakdown
+                ))
+            }
+        }
+
+        // Parse model totals
+        if let totals = firstData.total {
+            for modelTotal in totals {
+                let modelName = modelTotal.model ?? "Unknown"
+                var tCacheHit: Double = 0
+                var tCacheMiss: Double = 0
+                var tOutput: Double = 0
+                var tRequest: Double = 0
+                var tTotal: Double = 0
+
+                if let items = modelTotal.usage {
+                    for item in items {
+                        let amount = Double(item.amount ?? "0") ?? 0
+                        switch item.type {
+                        case "PROMPT_CACHE_HIT_TOKEN":
+                            tCacheHit += amount
+                        case "PROMPT_CACHE_MISS_TOKEN":
+                            tCacheMiss += amount
+                        case "RESPONSE_TOKEN":
+                            tOutput += amount
+                        case "REQUEST":
+                            tRequest += amount
+                        default:
+                            break
+                        }
+                        tTotal += amount
+                    }
+                }
+
+                modelTotals.append(DeepSeekModelTotalUsage(
+                    modelName: modelName,
+                    cacheHitTokens: tCacheHit,
+                    cacheMissTokens: tCacheMiss,
+                    outputTokens: tOutput,
+                    requestCount: tRequest,
+                    totalAmount: tTotal
+                ))
+            }
+        }
+
+        dailyUsage.sort { $0.date < $1.date }
+
+        return DeepSeekPlatformUsage(
+            currency: currency,
+            year: year,
+            month: month,
+            dailyUsage: dailyUsage,
+            modelTotals: modelTotals
         )
     }
 
@@ -183,7 +314,7 @@ struct DeepSeekBalanceResponse: Decodable {
     }
 }
 
-// MARK: - Platform API Response Models (for usage/cost)
+// MARK: - Platform API Response Models
 
 struct DeepSeekPlatformCostResponse: Decodable {
     let code: Int?
@@ -219,6 +350,7 @@ struct DeepSeekModelUsage: Decodable {
 struct DeepSeekUsageItem: Decodable {
     let amount: String?
     let unit: String?
+    let type: String?
 }
 
 struct DeepSeekModelTotal: Decodable {
