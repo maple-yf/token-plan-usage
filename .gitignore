@@ -30,3 +30,6 @@ DerivedData
 *.swp
 *~
 .build/
+
+# 测试数据（含 API key 等敏感信息）
+.testData
