@@ -78,8 +78,13 @@ struct DeepSeekUsageView: View {
                     color: .orange
                 )
                 summaryItem(
+                    title: "总 Tokens",
+                    value: formatTokenCount(Int(usage.totalTokens)),
+                    color: .purple
+                )
+                summaryItem(
                     title: "总请求数",
-                    value: formatRequestCount(usage.totalRequests),
+                    value: "\(Int(usage.totalRequests))",
                     color: .blue
                 )
             }
@@ -183,7 +188,7 @@ struct DeepSeekUsageView: View {
             Chart(usage.dailyUsage) { day in
                 BarMark(
                     x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("金额", day.totalAmount)
+                    y: .value("金额", day.totalCost)
                 )
                 .foregroundStyle(.orange.gradient)
             }
@@ -194,10 +199,10 @@ struct DeepSeekUsageView: View {
                 }
             }
             .chartYAxis {
-                AxisMarks { value in
+                AxisMarks(position: .leading) { value in
                     AxisValueLabel {
                         if let v = value.as(Double.self) {
-                            Text(String(format: "%.0f", v))
+                            Text(formatCostAxisLabel(v))
                                 .font(.caption2)
                         }
                     }
@@ -210,72 +215,89 @@ struct DeepSeekUsageView: View {
     }
 
     // Chart 2: API request count area + line chart (light blue)
+    @ViewBuilder
     private var apiRequestChart: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("API 请求次数", systemImage: "arrow.triangle.branch")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.blue)
 
-            Chart(usage.dailyUsage) { day in
-                AreaMark(
-                    x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("请求数", day.requestCount)
-                )
-                .foregroundStyle(.blue.opacity(0.15).gradient)
-                .interpolationMethod(.catmullRom)
+            if usage.totalRequests > 0 {
+                Chart(usage.dailyUsage) { day in
+                    AreaMark(
+                        x: .value("日期", formatDateLabel(day.date)),
+                        y: .value("请求数", day.requestCount)
+                    )
+                    .foregroundStyle(.blue.opacity(0.15).gradient)
+                    .interpolationMethod(.catmullRom)
 
-                LineMark(
-                    x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("请求数", day.requestCount)
-                )
-                .foregroundStyle(.blue.gradient)
-                .interpolationMethod(.catmullRom)
-            }
-            .chartXAxis {
-                AxisMarks(values: xAxisDateLabels) { value in
-                    AxisValueLabel()
-                        .font(.caption2)
+                    LineMark(
+                        x: .value("日期", formatDateLabel(day.date)),
+                        y: .value("请求数", day.requestCount)
+                    )
+                    .foregroundStyle(.blue.gradient)
+                    .interpolationMethod(.catmullRom)
                 }
-            }
-            .chartYAxis {
-                AxisMarks { value in
-                    AxisValueLabel {
-                        if let v = value.as(Double.self) {
-                            Text(String(format: "%.0f", v))
-                                .font(.caption2)
+                .chartXAxis {
+                    AxisMarks(values: xAxisDateLabels) { value in
+                        AxisValueLabel()
+                            .font(.caption2)
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisValueLabel {
+                            if let v = value.as(Double.self) {
+                                Text(formatRequestAxisLabel(v))
+                                    .font(.caption2)
+                            }
                         }
                     }
                 }
+                .frame(height: 150)
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("当前计费不按请求次数统计")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("可查看下方模型费用分布")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 150)
             }
-            .frame(height: 150)
         }
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
-    // Chart 3: Token consumption stacked bar chart (three shades of blue)
+    // Chart 3: Token distribution stacked bar chart — values are real token counts from /usage/amount
     private var tokenStackedBarChart: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Tokens 消耗量", systemImage: "square.stack.3d.up.fill")
+            Label("Tokens 分布", systemImage: "square.stack.3d.up.fill")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.blue)
 
             Chart(usage.dailyUsage) { day in
                 BarMark(
                     x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("命中缓存", day.cacheHitTokens)
+                    y: .value("命中缓存", day.promptCacheHitTokens)
                 )
                 .foregroundStyle(.cyan.opacity(0.7))
 
                 BarMark(
                     x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("未命中缓存", day.cacheMissTokens)
+                    y: .value("未命中缓存", day.promptCacheMissTokens)
                 )
                 .foregroundStyle(.blue.opacity(0.7))
 
                 BarMark(
                     x: .value("日期", formatDateLabel(day.date)),
-                    y: .value("输出", day.outputTokens)
+                    y: .value("输出", day.responseTokens)
                 )
                 .foregroundStyle(.indigo.opacity(0.8))
             }
@@ -286,10 +308,10 @@ struct DeepSeekUsageView: View {
                 }
             }
             .chartYAxis {
-                AxisMarks { value in
+                AxisMarks(position: .leading) { value in
                     AxisValueLabel {
                         if let v = value.as(Double.self) {
-                            Text(String(format: "%.1f", v))
+                            Text(formatTokenAxisLabel(v))
                                 .font(.caption2)
                         }
                     }
@@ -327,21 +349,34 @@ struct DeepSeekUsageView: View {
             }
 
             HStack(spacing: 0) {
-                detailStatItem(title: "API 请求", value: formatRequestCount(model.requestCount), color: .blue)
-                detailStatItem(title: "Tokens 消耗", value: String(format: "%.2f", model.totalAmount), color: .purple)
+                detailStatItem(
+                    title: "API 请求",
+                    value: "\(Int(model.requestCount))",
+                    color: .blue
+                )
+                detailStatItem(
+                    title: "Tokens 消耗",
+                    value: formatTokenCount(Int(model.totalTokens)),
+                    color: .purple
+                )
+                detailStatItem(
+                    title: "费用消耗",
+                    value: String(format: "%@ %.2f", usage.currency, model.totalCost),
+                    color: .orange
+                )
             }
 
             HStack(spacing: 6) {
                 tokenTypeDot(color: .cyan, label: "命中")
-                Text(String(format: "%.4f", model.cacheHitTokens))
+                Text(formatTokenCount(Int(model.promptCacheHitTokens)))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 tokenTypeDot(color: .blue, label: "未命中")
-                Text(String(format: "%.4f", model.cacheMissTokens))
+                Text(formatTokenCount(Int(model.promptCacheMissTokens)))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 tokenTypeDot(color: .indigo, label: "输出")
-                Text(String(format: "%.4f", model.outputTokens))
+                Text(formatTokenCount(Int(model.responseTokens)))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -366,7 +401,7 @@ struct DeepSeekUsageView: View {
 
     private var tokenBreakdownSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Token 细分", systemImage: "square.split.2x2.fill")
+            Label("Tokens 细分", systemImage: "square.split.2x2.fill")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
 
@@ -374,17 +409,17 @@ struct DeepSeekUsageView: View {
                 tokenBreakdownItem(
                     color: .cyan,
                     title: "输入（命中缓存）",
-                    value: usage.modelTotals.reduce(0) { $0 + $1.cacheHitTokens }
+                    value: usage.modelTotals.reduce(0) { $0 + $1.promptCacheHitTokens }
                 )
                 tokenBreakdownItem(
                     color: .blue,
                     title: "输入（未命中缓存）",
-                    value: usage.modelTotals.reduce(0) { $0 + $1.cacheMissTokens }
+                    value: usage.modelTotals.reduce(0) { $0 + $1.promptCacheMissTokens }
                 )
                 tokenBreakdownItem(
                     color: .indigo,
                     title: "输出",
-                    value: usage.modelTotals.reduce(0) { $0 + $1.outputTokens }
+                    value: usage.modelTotals.reduce(0) { $0 + $1.responseTokens }
                 )
             }
         }
@@ -402,7 +437,7 @@ struct DeepSeekUsageView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
-            Text(String(format: "\(usage.currency) %.4f", value))
+            Text(formatTokenCount(Int(value)))
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.primary)
         }
@@ -478,6 +513,76 @@ struct DeepSeekUsageView: View {
         return String(format: "%.0f", count)
     }
 
+    private func formatCostAxisLabel(_ value: Double) -> String {
+        let symbol = currencySymbol(for: usage.currency)
+        if abs(value) >= 1 {
+            return String(format: "%@%.1f", symbol, value)
+        } else if abs(value) >= 0.01 {
+            return String(format: "%@%.2f", symbol, value)
+        } else {
+            return String(format: "%@%.3f", symbol, value)
+        }
+    }
+
+    private func formatRequestAxisLabel(_ value: Double) -> String {
+        if value >= 1000 {
+            return String(format: "%.1fK", value / 1000)
+        }
+        return String(format: "%.0f", value)
+    }
+
+    /// Compact token count formatter: 1234 -> "1.2K", 1_500_000 -> "1.5M", etc.
+    private func formatTokenCount(_ count: Int) -> String {
+        let thresholds: [(divisor: Double, suffix: String)] = [
+            (1_000_000_000_000.0, "T"),
+            (1_000_000_000.0, "G"),
+            (1_000_000.0, "M"),
+            (1_000.0, "K"),
+        ]
+        for (divisor, suffix) in thresholds {
+            if Double(count) >= divisor {
+                let value = Double(count) / divisor
+                if value >= 100 || value == value.rounded() {
+                    return "\(Int(value))\(suffix)"
+                }
+                return String(format: "%.1f%@", value, suffix)
+            }
+        }
+        return "\(count)"
+    }
+
+    /// Format a Double for token axis labels (real values may exceed Int range).
+    private func formatTokenAxisLabel(_ value: Double) -> String {
+        if value == 0 { return "0" }
+        let thresholds: [(divisor: Double, suffix: String)] = [
+            (1_000_000_000_000.0, "T"),
+            (1_000_000_000.0, "G"),
+            (1_000_000.0, "M"),
+            (1_000.0, "K"),
+        ]
+        for (divisor, suffix) in thresholds {
+            if abs(value) >= divisor {
+                let v = value / divisor
+                if v >= 100 || v == v.rounded() {
+                    return "\(Int(v))\(suffix)"
+                }
+                return String(format: "%.1f%@", v, suffix)
+            }
+        }
+        return String(format: "%.0f", value)
+    }
+
+    private func currencySymbol(for code: String) -> String {
+        switch code.uppercased() {
+        case "CNY": return "¥"
+        case "USD": return "$"
+        case "EUR": return "€"
+        case "JPY": return "¥"
+        case "GBP": return "£"
+        default: return code + " "
+        }
+    }
+
     private func tokenTypeDot(color: Color, label: String) -> some View {
         HStack(spacing: 2) {
             Circle().fill(color).frame(width: 5, height: 5)
@@ -494,18 +599,26 @@ struct DeepSeekUsageView: View {
         year: 2026,
         month: 5,
         dailyUsage: [
-            DeepSeekDailyUsage(date: "2026-05-01", totalAmount: 0, requestCount: 0, cacheHitTokens: 0, cacheMissTokens: 0, outputTokens: 0, modelBreakdown: []),
-            DeepSeekDailyUsage(date: "2026-05-02", totalAmount: 1.5, requestCount: 3, cacheHitTokens: 0.2, cacheMissTokens: 0.9, outputTokens: 0.4, modelBreakdown: []),
-            DeepSeekDailyUsage(date: "2026-05-03", totalAmount: 2.8, requestCount: 5, cacheHitTokens: 0.4, cacheMissTokens: 1.6, outputTokens: 0.8, modelBreakdown: []),
-            DeepSeekDailyUsage(date: "2026-05-04", totalAmount: 1.2, requestCount: 2, cacheHitTokens: 0.1, cacheMissTokens: 0.7, outputTokens: 0.4, modelBreakdown: []),
-            DeepSeekDailyUsage(date: "2026-05-05", totalAmount: 3.5, requestCount: 8, cacheHitTokens: 0.5, cacheMissTokens: 2.0, outputTokens: 1.0, modelBreakdown: [])
+            DeepSeekDailyUsage(date: "2026-05-01", totalCost: 0, promptCacheHitCost: 0, promptCacheMissCost: 0, responseCost: 0, promptTokenCost: 0, requestCount: 0, totalTokens: 0, promptCacheHitTokens: 0, promptCacheMissTokens: 0, responseTokens: 0, promptTokens: 0, modelBreakdown: []),
+            DeepSeekDailyUsage(date: "2026-05-02", totalCost: 1.5, promptCacheHitCost: 0.2, promptCacheMissCost: 0.9, responseCost: 0.4, promptTokenCost: 0, requestCount: 3, totalTokens: 120_000, promptCacheHitTokens: 80_000, promptCacheMissTokens: 25_000, responseTokens: 15_000, promptTokens: 0, modelBreakdown: []),
+            DeepSeekDailyUsage(date: "2026-05-03", totalCost: 2.8, promptCacheHitCost: 0.4, promptCacheMissCost: 1.6, responseCost: 0.8, promptTokenCost: 0, requestCount: 5, totalTokens: 250_000, promptCacheHitTokens: 160_000, promptCacheMissTokens: 60_000, responseTokens: 30_000, promptTokens: 0, modelBreakdown: []),
+            DeepSeekDailyUsage(date: "2026-05-04", totalCost: 1.2, promptCacheHitCost: 0.1, promptCacheMissCost: 0.7, responseCost: 0.4, promptTokenCost: 0, requestCount: 2, totalTokens: 90_000, promptCacheHitTokens: 50_000, promptCacheMissTokens: 25_000, responseTokens: 15_000, promptTokens: 0, modelBreakdown: []),
+            DeepSeekDailyUsage(date: "2026-05-05", totalCost: 3.5, promptCacheHitCost: 0.5, promptCacheMissCost: 2.0, responseCost: 1.0, promptTokenCost: 0, requestCount: 8, totalTokens: 350_000, promptCacheHitTokens: 200_000, promptCacheMissTokens: 100_000, responseTokens: 50_000, promptTokens: 0, modelBreakdown: [])
         ],
         modelTotals: [
-            DeepSeekModelTotalUsage(modelName: "deepseek-v4-pro", cacheHitTokens: 0.8, cacheMissTokens: 4.0, outputTokens: 2.0, requestCount: 12, totalAmount: 6.8),
-            DeepSeekModelTotalUsage(modelName: "deepseek-v4-flash", cacheHitTokens: 0.4, cacheMissTokens: 1.2, outputTokens: 0.6, requestCount: 6, totalAmount: 2.2)
+            DeepSeekModelTotalUsage(
+                modelName: "deepseek-v4-pro",
+                promptCacheHitCost: 0.8, promptCacheMissCost: 4.0, responseCost: 2.0, promptTokenCost: 0, totalCost: 6.8,
+                promptCacheHitTokens: 490_000, promptCacheMissTokens: 210_000, responseTokens: 110_000, promptTokens: 0,
+                totalTokens: 810_000, requestCount: 12),
+            DeepSeekModelTotalUsage(
+                modelName: "deepseek-v4-flash",
+                promptCacheHitCost: 0.4, promptCacheMissCost: 1.2, responseCost: 0.6, promptTokenCost: 0, totalCost: 2.2,
+                promptCacheHitTokens: 80_000, promptCacheMissTokens: 30_000, responseTokens: 15_000, promptTokens: 0,
+                totalTokens: 125_000, requestCount: 6)
         ]
     )
-    return DeepSeekUsageView(
+    DeepSeekUsageView(
         usage: sample,
         balance: DeepSeekBalance(currency: "CNY", totalBalance: "50.77", grantedBalance: "0.00", toppedUpBalance: "50.77"),
         isLoading: false,
