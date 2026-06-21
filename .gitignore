@@ -34,4 +34,15 @@ DerivedData
 # 测试数据（含 API key 等敏感信息）
 .testData
 
+# 凭据与密钥（防御性忽略）
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.cer
+secrets/
+credentials/
+
+# 工具本地状态
 .claude/
