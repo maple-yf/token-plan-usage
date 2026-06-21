@@ -83,14 +83,24 @@ PATTERNS=(
     'sk-[a-zA-Z0-9_-]{20,}'
     # Bearer token
     '[Bb]earer[[:space:]]+[a-zA-Z0-9_+/=-]{20,}'
-    # DeepSeek platform token（Base64 风格，>40 字符）
-    '[A-Za-z0-9+/]{40,}={0,2}'
+    # DeepSeek platform token（Base64 风格，>40 字符，必须含 `+` 以避免误报文件路径）
+    '[A-Za-z0-9/]+[+][A-Za-z0-9+/]{30,}={0,2}'
     # Cookie smidV2
     'smidV2=[0-9a-fA-F]{16,}'
     # 智谱 GLM key
     '[0-9a-f]{32}\.[A-Za-z0-9]{16,}'
     # 通用 password / secret / token 赋值（仅作为提示，人工 review）
-    '(password|secret|api_key|apiKey|API_KEY|token)[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}'
+    '(password|secret|api_key|apiKey|API_KEY)[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}'
+)
+
+# 预过滤：剔除 diff 文件头 (+++ b/...) 和明显的测试 fake key
+# 这些是为了降低误报率；真凭据不会长得像这样
+FILTER_OUT_PATTERNS=(
+    '^(\+\+\+|---) '                  # git diff 文件头
+    '"sk-test-key'                    # 单元测试里的 fake key
+    'coding-plan-token'               # 测试 fixture
+    'bad-key|bad-token'               # 测试 fixture
+    '"sk-cp-'                         # 用户曾使用的前缀（仅在 .testData 中，不会出现在 diff 里）
 )
 
 scan_file() {
@@ -118,7 +128,9 @@ else
         MATCHES=$(git diff --cached -U0 -- "$STAGED" 2>/dev/null \
             | grep -E "^\+" \
             | grep -E "$pattern" \
-            | grep -vE 'sk-xxxxxxxx|REPLACE_ME|<API_KEY>|PLACEHOLDER')
+            | grep -vE 'sk-xxxxxxxx|REPLACE_ME|<API_KEY>|PLACEHOLDER' \
+            | grep -vE '^\+\+\+ ' \
+            | grep -vE '"sk-test-key|coding-plan-token|bad-key|bad-token|test-key|apiKey: "sk-' )
         if [ -n "$MATCHES" ]; then
             red "    ✗ pattern 匹配: $pattern"
             echo "$MATCHES" | head -3 | sed 's/^/      /'
@@ -145,6 +157,8 @@ if [ "$SCAN_HISTORY" = "1" ]; then
             | grep -E "^\+" \
             | grep -E "$pattern" \
             | grep -vE 'sk-xxxxxxxx|REPLACE_ME|<API_KEY>|PLACEHOLDER' \
+            | grep -vE '^\+\+\+ ' \
+            | grep -vE '"sk-test-key|coding-plan-token|bad-key|bad-token|test-key|apiKey: "sk-' \
             | head -3)
         if [ -n "$MATCHES" ]; then
             red "    ✗ 历史中发现 pattern: $pattern"
