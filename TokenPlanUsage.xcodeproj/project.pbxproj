@@ -46,6 +46,7 @@
 		C09199DBDDE13D7C773B22A1 /* GLMProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */; };
 		C193E5B85DB73B6A34467ED8 /* RingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A15F503173370A66249088B /* RingProgressView.swift */; };
 		C46EABF54DBFCD338A87B7AE /* MCPQuotaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BAFB654059AB8D32E5DA463 /* MCPQuotaView.swift */; };
+		C9DD0420B0F151F56AD5C163 /* DeepSeekProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF88A5E8B087F52990D8037 /* DeepSeekProviderTests.swift */; };
 		CA26CAC11ACFC40AE2164189 /* DeepSeekUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92047690DD311B26F7BFDAE /* DeepSeekUsageView.swift */; };
 		D7702432FC9DEF2F71FF8521 /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122DE4AACB55470317939C26 /* SettingsViewModelTests.swift */; };
 		DAD4C6195CD1B8C4D741376C /* MonitorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EFFB2AD875977B37065093 /* MonitorViewModelTests.swift */; };
@@ -90,6 +91,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0FF88A5E8B087F52990D8037 /* DeepSeekProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekProviderTests.swift; sourceTree = "<group>"; };
 		122DE4AACB55470317939C26 /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
 		16DB17BE0245753E27416C4C /* TokenPlanUsageWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenPlanUsageWidget.entitlements; sourceTree = "<group>"; };
 		17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProviderTests.swift; sourceTree = "<group>"; };
@@ -101,10 +103,10 @@
 		2D8E7E3857E1D4E4CFF1F1A1 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		3372058EA405BF4BC3C89CF2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3887ABC4F8B813CE1D2093BC /* TokenPlanUsageWidgetEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPlanUsageWidgetEntryView.swift; sourceTree = "<group>"; };
-		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A97DF33F4CDF74514F3B567 /* TokenPlanUsage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TokenPlanUsage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ECD5C7DCA39DE39891D3D97 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 		3F0C4F50F1D053067224EC39 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
-		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		445706C15D83B21975536D32 /* TokenPlanUsageWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TokenPlanUsageWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		49EC521B20E0E190FF2645A0 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		4BEBC3E7433EB7F4CF8F5314 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		5676C4C0C861187BDBA01789 /* DeepSeekPlatformUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekPlatformUsage.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 		386077059752BBC116298F3D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				0FF88A5E8B087F52990D8037 /* DeepSeekProviderTests.swift */,
 				17FB4662F3F1A75C20EE5DC5 /* GLMProviderTests.swift */,
 				CE52CCEC37AC0D02BD06B65E /* KeychainServiceTests.swift */,
 				A109EEBA2ED131D32BB6BB04 /* MiniMaxProviderTests.swift */,
@@ -422,6 +425,12 @@
 					8F8C55C1B1E00C1CF99F17D8 = {
 						DevelopmentTeam = "";
 					};
+					D26060D0B85A84F26C8E773B = {
+						DevelopmentTeam = "";
+					};
+					E2DC38F74E6FEF2BBCDE3DD8 = {
+						DevelopmentTeam = "";
+					};
 				};
 			};
 			buildConfigurationList = E88327032F2441FBA64A6614 /* Build configuration list for PBXProject "TokenPlanUsage" */;
@@ -476,6 +485,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9DD0420B0F151F56AD5C163 /* DeepSeekProviderTests.swift in Sources */,
 				C09199DBDDE13D7C773B22A1 /* GLMProviderTests.swift in Sources */,
 				FB9B7AB15C998A42726F331A /* KeychainServiceTests.swift in Sources */,
 				EEA57DF3E997376FFF076F0D /* MiniMaxProviderTests.swift in Sources */,
@@ -547,7 +557,6 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -571,7 +580,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
@@ -594,7 +602,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsageWidget/TokenPlanUsageWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TokenPlanUsageWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Usage Widget";
@@ -676,7 +683,6 @@
 				CODE_SIGN_ENTITLEMENTS = TokenPlanUsage/TokenPlanUsage.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W4X228JB32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Token Plan Usage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
