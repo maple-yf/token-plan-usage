@@ -26,48 +26,72 @@ struct MiniMaxModelsView: View {
     }
 
     private func modelRow(quota: MiniMaxModelQuota) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             HStack {
                 Text(quota.modelName)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.primary)
                 Spacer()
-                Text("\(quota.remainingCount) / \(quota.totalCount)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                if quota.isWeeklyUnlimited {
+                    Text("周额度 无限制")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
 
-            ProgressView(value: Double(quota.remainingCount), total: Double(max(quota.totalCount, 1)))
-                .tint(progressColor(remaining: quota.remainingCount, total: quota.totalCount))
-                .progressViewStyle(.linear)
+            // 5-hour interval progress (remaining)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("5 小时限额")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(String(format: "剩余 %.0f%% · 已用 %.0f%%",
+                                quota.intervalRemainingPercent,
+                                quota.intervalUsedPercent))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                ProgressView(value: quota.intervalRemainingPercent, total: 100)
+                    .tint(progressColor(remainingPercent: quota.intervalRemainingPercent))
+                    .progressViewStyle(.linear)
+            }
 
-            HStack(spacing: 0) {
-                statItem(title: "已用", value: "\(quota.usedCount)", color: .blue)
-                Divider().frame(height: 24).background(.quaternary)
-                statItem(title: "剩余", value: "\(quota.remainingCount)", color: .green)
-                Divider().frame(height: 24).background(.quaternary)
-                statItem(title: "总量", value: "\(quota.totalCount)", color: .secondary)
+            // Weekly quota (if not unlimited and data present)
+            if !quota.isWeeklyUnlimited, let weeklyRemaining = quota.weeklyRemainingPercent {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("周额度")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(String(format: "剩余 %.0f%% · 已用 %.0f%%",
+                                    weeklyRemaining,
+                                    max(0, 100 - weeklyRemaining)))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    ProgressView(value: weeklyRemaining, total: 100)
+                        .tint(progressColor(remainingPercent: weeklyRemaining))
+                        .progressViewStyle(.linear)
+                }
             }
         }
+        .padding(10)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
     }
 
-    private func statItem(title: String, value: String, color: Color) -> some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.system(size: 13, weight: .bold, design: .rounded))
-                .foregroundStyle(color)
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func progressColor(remaining: Int, total: Int) -> Color {
-        guard total > 0 else { return .gray }
-        let ratio = Double(remaining) / Double(total)
-        if ratio > 0.5 { return .green }
-        if ratio > 0.2 { return .orange }
+    private func progressColor(remainingPercent: Double) -> Color {
+        if remainingPercent > 50 { return .green }
+        if remainingPercent > 20 { return .orange }
         return .red
     }
+}
+
+#Preview {
+    MiniMaxModelsView(quotas: [
+        MiniMaxModelQuota(modelName: "MiniMax-M*", intervalRemainingPercent: 95.8, weeklyStatus: 3, weeklyRemainingPercent: nil),
+        MiniMaxModelQuota(modelName: "speech-hd", intervalRemainingPercent: 42, weeklyStatus: 0, weeklyRemainingPercent: 88.5)
+    ])
+    .background(.blue.opacity(0.3))
 }

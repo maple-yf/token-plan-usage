@@ -23,20 +23,50 @@ struct MonitorView: View {
     }
 
     var body: some View {
-        let current = providers[selectedProviderIndex]
-        MonitorProviderView(provider: current.provider, config: current.config)
-            .id(selectedProviderIndex)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ProviderSegmentControl(
-                        providers: providers.map { $0.name },
-                        selectedIndex: selectedProviderIndex,
-                        onSelect: { index in
-                            selectedProviderIndex = index
+        // Guard against index out-of-bounds when providers are filtered out
+        // (e.g. GLM disabled in Settings). Use a clamped index.
+        let safeIndex = providers.isEmpty ? 0 : min(selectedProviderIndex, providers.count - 1)
+        Group {
+            if providers.isEmpty {
+                noProvidersState
+            } else {
+                let current = providers[safeIndex]
+                MonitorProviderView(provider: current.provider, config: current.config)
+                    .id(safeIndex)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            ProviderSegmentControl(
+                                providers: providers.map { $0.name },
+                                selectedIndex: safeIndex,
+                                onSelect: { index in
+                                    selectedProviderIndex = index
+                                }
+                            )
                         }
-                    )
-                }
+                    }
+                    .onChange(of: providers.count) { _, _ in
+                        // Keep the selected index valid if a provider disappears.
+                        if selectedProviderIndex >= providers.count {
+                            selectedProviderIndex = max(0, providers.count - 1)
+                        }
+                    }
             }
+        }
+    }
+
+    private var noProvidersState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "gearshape")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+            Text("未启用任何 Provider")
+                .font(.headline)
+            Text("请前往设置页面启用至少一个 Provider")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(40)
     }
 }
 
@@ -46,11 +76,13 @@ private struct MonitorProviderView: View {
     @State private var viewModel: MonitorViewModel
     private let isGLM: Bool
     private let isDeepSeek: Bool
+    private let isMiniMax: Bool
 
     init(provider: TokenProvider, config: ProviderConfig) {
         _viewModel = State(wrappedValue: MonitorViewModel(provider: provider, config: config))
         self.isGLM = provider.id == "glm"
         self.isDeepSeek = provider.id == "deepseek"
+        self.isMiniMax = provider.id == "minimax"
     }
 
     var body: some View {
@@ -130,54 +162,60 @@ private struct MonitorProviderView: View {
     // MARK: - Other Provider Content
 
     private var otherProviderContent: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                if let snapshot = viewModel.snapshot {
-                    staleDataWarning(snapshot: snapshot)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 20) {
+                    if let snapshot = viewModel.snapshot {
+                        staleDataWarning(snapshot: snapshot)
 
-                    RingProgressView(
-                        progress: snapshot.remainingPercent,
-                        usedCount: snapshot.usedCount,
-                        totalCount: snapshot.totalCount,
-                        planName: snapshot.planName,
-                        remainingTimeString: formatRemainingTime(snapshot.refreshTime),
-                        onRefresh: { Task { await viewModel.refresh() } }
-                    )
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                        RingProgressView(
+                            progress: snapshot.remainingPercent,
+                            usedCount: snapshot.usedCount,
+                            totalCount: snapshot.totalCount,
+                            planName: snapshot.planName,
+                            remainingTimeString: formatRemainingTime(snapshot.refreshTime),
+                            onRefresh: { Task { await viewModel.refresh() } }
+                        )
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
 
-                    UsageDetailView(
-                        usedCount: snapshot.usedCount,
-                        totalCount: snapshot.totalCount,
-                        remainingPercent: snapshot.remainingPercent,
-                        remainingTimeString: formatRemainingTime(snapshot.refreshTime)
-                    )
+                        UsageDetailView(
+                            usedCount: snapshot.usedCount,
+                            totalCount: snapshot.totalCount,
+                            remainingPercent: snapshot.remainingPercent,
+                            remainingTimeString: formatRemainingTime(snapshot.refreshTime)
+                        )
 
-                    if let mcpQuota = snapshot.mcpQuota {
-                        MCPQuotaView(quota: mcpQuota)
+                        if let mcpQuota = snapshot.mcpQuota {
+                            MCPQuotaView(quota: mcpQuota)
+                        }
+
+                        if let modelQuotas = snapshot.modelQuotas {
+                            MiniMaxModelsView(quotas: modelQuotas)
+                        }
+
+                        // MiniMax API has no historical time-series data, so the trend
+                        // chart is hidden for it (see docs/plans). GLM/others keep it.
+                        if !isMiniMax, let distribution = viewModel.distribution {
+                            distributionChart(distribution)
+                        }
+                    } else if viewModel.errorMessage != nil {
+                        errorOverlay
+                    } else if !viewModel.isLoading {
+                        noProviderState
+                    } else {
+                        loadingSkeleton
                     }
-
-                    if let modelQuotas = snapshot.modelQuotas {
-                        MiniMaxModelsView(quotas: modelQuotas)
-                    }
-
-                    if let distribution = viewModel.distribution {
-                        distributionChart(distribution)
-                    }
-                } else if viewModel.errorMessage != nil {
-                    errorOverlay
-                } else if !viewModel.isLoading {
-                    noProviderState
-                } else {
-                    loadingSkeleton
                 }
-
-                StatusBarView(
-                    status: viewModel.errorMessage != nil ? .error(viewModel.errorMessage ?? "") : (viewModel.snapshot?.status ?? .normal),
-                    lastUpdated: viewModel.snapshot?.fetchedAt,
-                    isLoading: viewModel.isLoading,
-                    onRefresh: { Task { await viewModel.refresh() } }
-                )
+                .padding()
             }
+
+            // StatusBar fixed at the bottom, outside the scroll view (matches DeepSeek layout).
+            StatusBarView(
+                status: viewModel.errorMessage != nil ? .error(viewModel.errorMessage ?? "") : (viewModel.snapshot?.status ?? .normal),
+                lastUpdated: viewModel.snapshot?.fetchedAt,
+                isLoading: viewModel.isLoading,
+                onRefresh: { Task { await viewModel.refresh() } }
+            )
             .padding()
         }
         .background(

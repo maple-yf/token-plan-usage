@@ -56,14 +56,11 @@ final class MiniMaxProviderTests: XCTestCase {
         {
             "model_remains": [
                 {
-                    "start_time": 1775959200000,
-                    "end_time": 1775977200000,
                     "remains_time": 14449904,
-                    "current_interval_total_count": 600,
-                    "current_interval_usage_count": 25,
+                    "current_interval_remaining_percent": 95.83,
                     "model_name": "MiniMax-M*",
-                    "current_weekly_total_count": 0,
-                    "current_weekly_usage_count": 0
+                    "current_weekly_status": 3,
+                    "current_weekly_remaining_percent": 100.0
                 }
             ],
             "base_resp": {"status_code": 0, "status_msg": "success"}
@@ -77,12 +74,22 @@ final class MiniMaxProviderTests: XCTestCase {
         )
 
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
-        XCTAssertEqual(snapshot.usedCount, 575)
-        XCTAssertEqual(snapshot.totalCount, 600)
         XCTAssertEqual(snapshot.providerId, "minimax")
         XCTAssertEqual(snapshot.planName, "MiniMax-M*")
-        XCTAssertEqual(snapshot.remainingPercent, Double(25) / Double(600), accuracy: 0.001)
+        // Real API returns percentage-based quotas. usedCount/totalCount are 0
+        // in percentage mode; remainingPercent is a 0-1 ratio.
+        XCTAssertEqual(snapshot.usedCount, 0)
+        XCTAssertEqual(snapshot.totalCount, 0)
+        XCTAssertEqual(snapshot.remainingPercent, 0.9583, accuracy: 0.001)
         XCTAssertNotNil(snapshot.refreshTime)
+
+        // Per-model quotas are populated from the response.
+        let quota = try XCTUnwrap(snapshot.modelQuotas?.first)
+        XCTAssertEqual(quota.modelName, "MiniMax-M*")
+        XCTAssertEqual(quota.intervalRemainingPercent, 95.83, accuracy: 0.001)
+        XCTAssertEqual(quota.weeklyStatus, 3)
+        XCTAssertEqual(quota.weeklyRemainingPercent, 100.0)
+        XCTAssertTrue(quota.isWeeklyUnlimited)
     }
 
     func testFetchUsageWithMultipleModels() async throws {
@@ -90,24 +97,18 @@ final class MiniMaxProviderTests: XCTestCase {
         {
             "model_remains": [
                 {
-                    "start_time": 1775959200000,
-                    "end_time": 1775977200000,
                     "remains_time": 14449904,
-                    "current_interval_total_count": 100,
-                    "current_interval_usage_count": 100,
+                    "current_interval_remaining_percent": 1.6,
                     "model_name": "speech-hd",
-                    "current_weekly_total_count": 28000,
-                    "current_weekly_usage_count": 27556
+                    "current_weekly_status": 0,
+                    "current_weekly_remaining_percent": 1.6
                 },
                 {
-                    "start_time": 1775959200000,
-                    "end_time": 1775977200000,
                     "remains_time": 14449904,
-                    "current_interval_total_count": 1500,
-                    "current_interval_usage_count": 1498,
+                    "current_interval_remaining_percent": 0.13,
                     "model_name": "MiniMax-M*",
-                    "current_weekly_total_count": 0,
-                    "current_weekly_usage_count": 0
+                    "current_weekly_status": 3,
+                    "current_weekly_remaining_percent": 100.0
                 }
             ],
             "base_resp": {"status_code": 0, "status_msg": "success"}
@@ -121,10 +122,15 @@ final class MiniMaxProviderTests: XCTestCase {
         )
 
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
-        // Should pick MiniMax-M* over speech-hd
+        // Should pick MiniMax-M* over speech-hd as the primary plan
         XCTAssertEqual(snapshot.planName, "MiniMax-M*")
-        XCTAssertEqual(snapshot.usedCount, 2)
-        XCTAssertEqual(snapshot.totalCount, 1500)
+        XCTAssertEqual(snapshot.remainingPercent, 0.0013, accuracy: 0.0001)
+
+        // All models should appear in modelQuotas
+        XCTAssertEqual(snapshot.modelQuotas?.count, 2)
+        let speechQuota = try XCTUnwrap(snapshot.modelQuotas?.first(where: { $0.modelName == "speech-hd" }))
+        XCTAssertEqual(speechQuota.intervalRemainingPercent, 1.6, accuracy: 0.001)
+        XCTAssertEqual(speechQuota.isWeeklyUnlimited, false)
     }
 
     func testFetchUsageFallsBackToFirstModel() async throws {
@@ -132,12 +138,11 @@ final class MiniMaxProviderTests: XCTestCase {
         {
             "model_remains": [
                 {
-                    "start_time": 1775959200000,
-                    "end_time": 1775977200000,
                     "remains_time": 14449904,
-                    "current_interval_total_count": 50,
-                    "current_interval_usage_count": 10,
-                    "model_name": "speech-hd"
+                    "current_interval_remaining_percent": 80.0,
+                    "model_name": "speech-hd",
+                    "current_weekly_status": 3,
+                    "current_weekly_remaining_percent": 100.0
                 }
             ],
             "base_resp": {"status_code": 0, "status_msg": "success"}
@@ -152,7 +157,7 @@ final class MiniMaxProviderTests: XCTestCase {
 
         let snapshot = try await provider.fetchUsage(apiKey: "test-key", baseURL: nil)
         XCTAssertEqual(snapshot.planName, "speech-hd")
-        XCTAssertEqual(snapshot.usedCount, 40)
+        XCTAssertEqual(snapshot.remainingPercent, 0.8, accuracy: 0.001)
     }
 
     // MARK: - Error Cases
@@ -238,9 +243,10 @@ final class MiniMaxProviderTests: XCTestCase {
         {
             "model_remains": [
                 {
-                    "current_interval_total_count": 100,
-                    "current_interval_usage_count": 0,
-                    "model_name": "MiniMax-M*"
+                    "current_interval_remaining_percent": 50.0,
+                    "model_name": "MiniMax-M*",
+                    "current_weekly_status": 3,
+                    "current_weekly_remaining_percent": 100.0
                 }
             ],
             "base_resp": {"status_code": 0, "status_msg": "success"}
@@ -254,6 +260,7 @@ final class MiniMaxProviderTests: XCTestCase {
         )
 
         let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: "https://custom.minimax.com")
-        XCTAssertEqual(snapshot.totalCount, 100)
+        // Real API is percentage-based; 50% remaining means remainingPercent = 0.5
+        XCTAssertEqual(snapshot.remainingPercent, 0.5, accuracy: 0.001)
     }
 }

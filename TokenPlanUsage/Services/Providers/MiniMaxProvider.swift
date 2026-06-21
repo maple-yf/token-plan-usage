@@ -28,7 +28,8 @@ class MiniMaxProvider: TokenProvider {
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange) async throws -> UsageDistribution {
-        // MiniMax API does not provide historical distribution data
+        // MiniMax API does not provide historical distribution data.
+        // The trend chart is hidden for MiniMax in MonitorView (see docs).
         return UsageDistribution(
             providerId: id,
             windowStart: Date().addingTimeInterval(-5 * 3600),
@@ -47,20 +48,24 @@ class MiniMaxProvider: TokenProvider {
                 case baseResp = "base_resp"
             }
 
+            /// MiniMax coding_plan remains entry. The real API returns percentage-based
+            /// quotas, not raw counts. Field semantics (see docs/plans):
+            /// - current_interval_remaining_percent: 5-hour interval remaining percent (0-100)
+            /// - current_weekly_status: weekly quota status; 3 = unlimited
+            /// - current_weekly_remaining_percent: weekly remaining percent (0-100)
+            /// - remains_time: milliseconds until the 5-hour interval refresh
             struct ModelRemain: Decodable {
-                let modelName: String
-                let currentIntervalTotalCount: Int
-                let currentIntervalUsageCount: Int
-                let startTime: TimeInterval?
-                let endTime: TimeInterval?
+                let modelName: String?
+                let currentIntervalRemainingPercent: Double?
+                let currentWeeklyStatus: Int?
+                let currentWeeklyRemainingPercent: Double?
                 let remainsTime: TimeInterval?
 
                 enum CodingKeys: String, CodingKey {
                     case modelName = "model_name"
-                    case currentIntervalTotalCount = "current_interval_total_count"
-                    case currentIntervalUsageCount = "current_interval_usage_count"
-                    case startTime = "start_time"
-                    case endTime = "end_time"
+                    case currentIntervalRemainingPercent = "current_interval_remaining_percent"
+                    case currentWeeklyStatus = "current_weekly_status"
+                    case currentWeeklyRemainingPercent = "current_weekly_remaining_percent"
                     case remainsTime = "remains_time"
                 }
             }
@@ -89,44 +94,45 @@ class MiniMaxProvider: TokenProvider {
             throw TokenProviderError.serverError(statusCode)
         }
 
-        // Find the main text model (MiniMax-M*) entry
         guard let remains = resp.modelRemains, !remains.isEmpty else {
             throw TokenProviderError.invalidResponse
         }
 
         // Prefer MiniMax-M* model, fall back to first entry
-        let mainModel = remains.first(where: { $0.modelName.hasPrefix("MiniMax-M") })
+        let mainModel = remains.first(where: { $0.modelName?.hasPrefix("MiniMax-M") ?? false })
             ?? remains.first!
 
-        let remainingCount = mainModel.currentIntervalUsageCount
-        let totalCount = mainModel.currentIntervalTotalCount
-        let usedCount = max(totalCount - remainingCount, 0)
-        let percent = totalCount > 0 ? Double(remainingCount) / Double(totalCount) : 0
+        // Real API is percentage-based. usedCount/totalCount are set to 0 so views
+        // enter "percentage mode" (isPercentageMode). remainingPercent is a 0-1 ratio.
+        let intervalRemainingPercent = max(0, min(100, mainModel.currentIntervalRemainingPercent ?? 0))
+        let remainingRatio = intervalRemainingPercent / 100.0
 
-        // end_time is in milliseconds
-        let refreshTime = mainModel.endTime.map { Date(timeIntervalSince1970: $0 / 1000) }
+        // remains_time is the milliseconds until the 5-hour interval refresh.
+        // Treat it as the refresh/reset timestamp = now + remains_time.
+        let refreshTime: Date? = mainModel.remainsTime.map { remainsMs -> Date in
+            // remains_time is a *duration* in ms until refresh, not an absolute timestamp.
+            return Date().addingTimeInterval(remainsMs / 1000.0)
+        }
 
         return UsageSnapshot(
             providerId: id,
-            planName: mainModel.modelName,
-            usedCount: usedCount,
-            totalCount: totalCount,
-            remainingPercent: percent,
+            planName: mainModel.modelName ?? "MiniMax",
+            usedCount: 0,
+            totalCount: 0,
+            remainingPercent: remainingRatio,
             refreshTime: refreshTime,
             fetchedAt: Date(),
             status: .normal,
             mcpQuota: nil,
-            modelQuotas: remains.map { model in
-                let remaining = model.currentIntervalUsageCount
-                let total = model.currentIntervalTotalCount
-                let used = max(total - remaining, 0)
+            modelQuotas: remains.compactMap { model in
+                guard let name = model.modelName else { return nil }
                 return MiniMaxModelQuota(
-                    modelName: model.modelName,
-                    usedCount: used,
-                    totalCount: total,
-                    remainingCount: remaining
+                    modelName: name,
+                    intervalRemainingPercent: model.currentIntervalRemainingPercent ?? 0,
+                    weeklyStatus: model.currentWeeklyStatus,
+                    weeklyRemainingPercent: model.currentWeeklyRemainingPercent
                 )
-            }.sorted { $0.totalCount > $1.totalCount }
+            }
         )
     }
 }

@@ -29,9 +29,18 @@ struct MCPQuota: Codable, Equatable {
 
 struct MiniMaxModelQuota: Codable, Equatable, Identifiable {
     let modelName: String
-    let usedCount: Int
-    let totalCount: Int
-    let remainingCount: Int
+    /// 5-hour interval remaining percent (0-100)
+    let intervalRemainingPercent: Double
+    /// Weekly quota status; nil if unknown. 3 = unlimited.
+    let weeklyStatus: Int?
+    /// Weekly remaining percent (0-100); nil if unknown or unlimited.
+    let weeklyRemainingPercent: Double?
 
     var id: String { modelName }
+
+    /// True when the weekly quota is unlimited (status == 3).
+    var isWeeklyUnlimited: Bool { weeklyStatus == 3 }
+
+    /// Used percent for the 5-hour interval (0-100).
+    var intervalUsedPercent: Double { max(0, min(100, 100 - intervalRemainingPercent)) }
 }
