@@ -127,7 +127,7 @@ struct ProviderConfigView: View {
         }
         .onChange(of: config.isEnabled) { _, isEnabled in
             try? KeychainService.shared.save(config)
-            SharedStore.shared.toggleProviderVisibility(config.id)
+            SharedStore.shared.setProviderVisibility(config.id, visible: isEnabled)
         }
         .onChange(of: config.baseURL) { _, _ in
             try? KeychainService.shared.save(config)

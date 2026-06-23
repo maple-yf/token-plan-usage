@@ -1,9 +1,22 @@
 import Foundation
+import Observation
 
-class SharedStore {
+@Observable
+final class SharedStore {
     static let shared = SharedStore()
 
+    /// Provider IDs that should appear as tabs in the Monitor view.
+    /// Mirrors `ProviderConfig.isEnabled` so changes from the Settings tab
+    /// propagate to the Monitor tab without extra plumbing.
+    var visibleProviderIds: [String]
+
     private let sharedDefaults = UserDefaults(suiteName: "group.com.tokenplan.usage")!
+    private let visibleProvidersKey = "VisibleProviderIds"
+
+    private init() {
+        self.visibleProviderIds = sharedDefaults.stringArray(forKey: "VisibleProviderIds")
+            ?? ["minimax", "glm", "deepseek"]
+    }
 
     func save(snapshot: UsageSnapshot) {
         if let data = try? JSONEncoder().encode(snapshot) {
@@ -44,28 +57,24 @@ class SharedStore {
 
     // MARK: - Visible Providers (for Monitor tab)
 
-    private let visibleProvidersKey = "VisibleProviderIds"
-
-    func saveVisibleProviderIds(_ ids: [String]) {
+    /// Idempotent: setting `visible: false` removes the id (if present);
+    /// setting `visible: true` adds the id (if missing). Calling twice
+    /// with the same flag leaves the list unchanged.
+    func setProviderVisibility(_ providerId: String, visible: Bool) {
+        var ids = visibleProviderIds
+        let contains = ids.contains(providerId)
+        guard contains != visible else { return }
+        if visible {
+            ids.append(providerId)
+        } else {
+            ids.removeAll { $0 == providerId }
+        }
+        visibleProviderIds = ids
         sharedDefaults.set(ids, forKey: visibleProvidersKey)
         sharedDefaults.synchronize()
     }
 
-    func loadVisibleProviderIds() -> [String] {
-        sharedDefaults.stringArray(forKey: visibleProvidersKey) ?? ["minimax", "glm", "deepseek"]
-    }
-
-    func toggleProviderVisibility(_ providerId: String) {
-        var ids = loadVisibleProviderIds()
-        if ids.contains(providerId) {
-            ids.removeAll { $0 == providerId }
-        } else {
-            ids.append(providerId)
-        }
-        saveVisibleProviderIds(ids)
-    }
-
     func isProviderVisible(_ providerId: String) -> Bool {
-        loadVisibleProviderIds().contains(providerId)
+        visibleProviderIds.contains(providerId)
     }
 }

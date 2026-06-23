@@ -18,7 +18,9 @@ struct MonitorView: View {
     }()
 
     private var providers: [(name: String, provider: TokenProvider, config: ProviderConfig)] {
-        let visibleIds = SharedStore.shared.loadVisibleProviderIds()
+        // Reads the observable property so SwiftUI re-renders when the
+        // Settings tab toggles a provider's `isEnabled` switch.
+        let visibleIds = SharedStore.shared.visibleProviderIds
         return allProviders.filter { visibleIds.contains($0.provider.id) }
     }
 

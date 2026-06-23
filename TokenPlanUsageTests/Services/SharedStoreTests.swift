@@ -79,4 +79,87 @@ final class SharedStoreTests: XCTestCase {
         SharedStore.shared.saveWidgetProvider("minimax")
         XCTAssertEqual(SharedStore.shared.loadWidgetProvider(), "minimax")
     }
+
+    // MARK: - Provider Visibility
+
+    private func resetVisibleProviders() {
+        SharedStore.shared.visibleProviderIds = ["minimax", "glm", "deepseek"]
+    }
+
+    func testSetProviderVisibilityFalseHidesProvider() {
+        resetVisibleProviders()
+
+        SharedStore.shared.setProviderVisibility("glm", visible: false)
+
+        XCTAssertFalse(SharedStore.shared.isProviderVisible("glm"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("minimax"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("deepseek"))
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds, ["minimax", "deepseek"])
+    }
+
+    func testSetProviderVisibilityTrueRestoresProvider() {
+        resetVisibleProviders()
+        SharedStore.shared.setProviderVisibility("glm", visible: false)
+
+        SharedStore.shared.setProviderVisibility("glm", visible: true)
+
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("glm"))
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds.sorted(), ["deepseek", "glm", "minimax"])
+    }
+
+    func testSetProviderVisibilityIsIdempotent() {
+        resetVisibleProviders()
+
+        // Hiding twice keeps it hidden without duplicating work or losing other entries.
+        SharedStore.shared.setProviderVisibility("glm", visible: false)
+        let afterFirstHide = SharedStore.shared.visibleProviderIds
+        SharedStore.shared.setProviderVisibility("glm", visible: false)
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds, afterFirstHide)
+
+        // Showing twice keeps it visible exactly once in the list.
+        SharedStore.shared.setProviderVisibility("glm", visible: true)
+        SharedStore.shared.setProviderVisibility("glm", visible: true)
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds.filter { $0 == "glm" }.count, 1)
+    }
+
+    /// Regression: previously the Settings toggle called `toggleProviderVisibility`
+    /// which inverted the visible state. With default `visibleProviderIds` already
+    /// containing all three providers, enabling a default-disabled provider
+    /// (glm / deepseek) would actually hide it. The fix uses an explicit
+    /// set operation keyed on `isEnabled`.
+    func testEnablingDefaultDisabledProviderKeepsItVisible() {
+        resetVisibleProviders()
+
+        SharedStore.shared.setProviderVisibility("glm", visible: true)
+        SharedStore.shared.setProviderVisibility("deepseek", visible: true)
+
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("glm"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("deepseek"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("minimax"))
+    }
+
+    func testDisablingDefaultEnabledProviderHidesIt() {
+        resetVisibleProviders()
+
+        SharedStore.shared.setProviderVisibility("minimax", visible: false)
+
+        XCTAssertFalse(SharedStore.shared.isProviderVisible("minimax"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("glm"))
+        XCTAssertTrue(SharedStore.shared.isProviderVisible("deepseek"))
+    }
+
+    func testVisibilityPersistsAcrossInstances() {
+        resetVisibleProviders()
+        SharedStore.shared.setProviderVisibility("glm", visible: false)
+
+        XCTAssertFalse(SharedStore.shared.isProviderVisible("glm"))
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds, ["minimax", "deepseek"])
+
+        // Re-enable from a different starting point — the new state
+        // reflects the latest setProviderVisibility call, not any stale
+        // in-memory value.
+        SharedStore.shared.visibleProviderIds = ["minimax"]
+        SharedStore.shared.setProviderVisibility("glm", visible: true)
+        XCTAssertEqual(SharedStore.shared.visibleProviderIds.sorted(), ["glm", "minimax"])
+    }
 }
