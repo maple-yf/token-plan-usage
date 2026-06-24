@@ -93,3 +93,13 @@ struct DeepSeekModelTotalUsage: Codable, Identifiable, Equatable {
     let totalTokens: Double
     let requestCount: Double
 }
+
+/// One data point on the monthly consumption trend chart.
+/// `month` is normalized to the 1st of that month at 00:00 local time.
+struct MonthlyConsumptionPoint: Identifiable, Equatable, Codable {
+    let month: Date
+    let consumption: Double
+    let currency: String
+
+    var id: Date { month }
+}

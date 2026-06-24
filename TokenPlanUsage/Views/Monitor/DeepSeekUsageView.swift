@@ -6,17 +6,23 @@ struct DeepSeekUsageView: View {
     let balance: DeepSeekBalance?
     let isLoading: Bool
     let errorMessage: String?
+    let monthlyTrend: [MonthlyConsumptionPoint]
+    let isMonthlyTrendLoading: Bool
+    let monthlyTrendErrorMessage: String?
     var onRefresh: (() -> Void)?
     var onMonthChange: ((Int, Int) -> Void)?
 
     @State private var selectedMonth: Date
     @State private var selectedDataPoint: DeepSeekDailyUsage?
 
-    init(usage: DeepSeekPlatformUsage, balance: DeepSeekBalance?, isLoading: Bool, errorMessage: String?, onRefresh: (() -> Void)?, onMonthChange: ((Int, Int) -> Void)?) {
+    init(usage: DeepSeekPlatformUsage, balance: DeepSeekBalance?, isLoading: Bool, errorMessage: String?, monthlyTrend: [MonthlyConsumptionPoint], isMonthlyTrendLoading: Bool, monthlyTrendErrorMessage: String?, onRefresh: (() -> Void)?, onMonthChange: ((Int, Int) -> Void)?) {
         self.usage = usage
         self.balance = balance
         self.isLoading = isLoading
         self.errorMessage = errorMessage
+        self.monthlyTrend = monthlyTrend
+        self.isMonthlyTrendLoading = isMonthlyTrendLoading
+        self.monthlyTrendErrorMessage = monthlyTrendErrorMessage
         self.onRefresh = onRefresh
         self.onMonthChange = onMonthChange
 
@@ -41,6 +47,7 @@ struct DeepSeekUsageView: View {
                     modelDetailSection
                     tokenBreakdownSection
                 }
+                monthlyTrendSection
             }
             .padding()
         }
@@ -485,6 +492,100 @@ struct DeepSeekUsageView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: - Monthly Trend Section
+
+    private var monthlyTrendSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("月度消费趋势", systemImage: "chart.line.uptrend.xyaxis")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.orange)
+                Spacer()
+                if !monthlyTrend.isEmpty {
+                    Text("近 \(monthlyTrend.count) 个月")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if isMonthlyTrendLoading && monthlyTrend.isEmpty {
+                trendPlaceholder { ProgressView().tint(.secondary) }
+            } else if monthlyTrend.isEmpty {
+                trendPlaceholder {
+                    VStack(spacing: 8) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                        Text("暂无月度消费数据")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } else {
+                Chart(monthlyTrend) { point in
+                    LineMark(
+                        x: .value("月份", point.month, unit: .month),
+                        y: .value("消费", point.consumption)
+                    )
+                    .foregroundStyle(.orange.gradient)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                    AreaMark(
+                        x: .value("月份", point.month, unit: .month),
+                        y: .value("消费", point.consumption)
+                    )
+                    .foregroundStyle(.orange.opacity(0.15).gradient)
+                    .interpolationMethod(.catmullRom)
+
+                    PointMark(
+                        x: .value("月份", point.month, unit: .month),
+                        y: .value("消费", point.consumption)
+                    )
+                    .foregroundStyle(.orange)
+                    .symbolSize(50)
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .month)) { _ in
+                        AxisValueLabel(format: .dateTime.month(.abbreviated), centered: true)
+                            .font(.caption2)
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisValueLabel {
+                            if let v = value.as(Double.self) {
+                                Text(formatTrendCostLabel(v))
+                                    .font(.caption2)
+                            }
+                        }
+                    }
+                }
+                .frame(height: 160)
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func trendPlaceholder<C: View>(@ViewBuilder content: () -> C) -> some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(.quaternary)
+            .frame(height: 160)
+            .overlay { content() }
+    }
+
+    private func formatTrendCostLabel(_ value: Double) -> String {
+        let symbol = currencySymbol(for: monthlyTrend.first?.currency ?? "CNY")
+        if abs(value) >= 1 {
+            return String(format: "%@%.1f", symbol, value)
+        } else if abs(value) >= 0.01 {
+            return String(format: "%@%.2f", symbol, value)
+        } else {
+            return String(format: "%@%.3f", symbol, value)
+        }
+    }
+
     // MARK: - Loading / Error / Empty
 
     private var loadingCharts: some View {
@@ -664,6 +765,9 @@ struct DeepSeekUsageView: View {
         balance: DeepSeekBalance(currency: "CNY", totalBalance: "50.77", grantedBalance: "0.00", toppedUpBalance: "50.77"),
         isLoading: false,
         errorMessage: nil,
+        monthlyTrend: [],
+        isMonthlyTrendLoading: false,
+        monthlyTrendErrorMessage: nil,
         onRefresh: {},
         onMonthChange: { _, _ in }
     )

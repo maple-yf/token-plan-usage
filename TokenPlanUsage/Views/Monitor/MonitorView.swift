@@ -106,6 +106,9 @@ private struct MonitorProviderView: View {
                         balance: viewModel.snapshot?.balance,
                         isLoading: viewModel.isPlatformUsageLoading,
                         errorMessage: viewModel.platformUsageErrorMessage,
+                        monthlyTrend: viewModel.monthlyTrend,
+                        isMonthlyTrendLoading: viewModel.isMonthlyTrendLoading,
+                        monthlyTrendErrorMessage: viewModel.monthlyTrendErrorMessage,
                         onRefresh: { Task { await viewModel.refresh() } },
                         onMonthChange: { month, year in
                             viewModel.onPlatformMonthChanged(month: month, year: year)

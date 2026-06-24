@@ -14,6 +14,12 @@ class MonitorViewModel {
     var isPlatformUsageLoading = false
     var platformUsageErrorMessage: String?
 
+    /// Past-6-month consumption trend for the DeepSeek chart. Empty when
+    /// unavailable (no token, or all month fetches failed).
+    var monthlyTrend: [MonthlyConsumptionPoint] = []
+    var isMonthlyTrendLoading = false
+    var monthlyTrendErrorMessage: String?
+
     private let provider: TokenProvider
     private let sharedStore = SharedStore.shared
 
@@ -64,7 +70,55 @@ class MonitorViewModel {
 
         if provider.id == "deepseek", let pt = config.platformToken, !pt.isEmpty {
             await refreshPlatformUsage()
+            await refreshMonthlyTrend()
         }
+    }
+
+    /// Fetches the past 6 months of total consumption in parallel (one
+    /// /usage/cost + /usage/amount per month, dispatched via TaskGroup).
+    /// Months that fail to load are silently skipped — a partial trend is
+    /// more useful than an empty chart.
+    func refreshMonthlyTrend(monthsBack: Int = 5) async {
+        guard let deepseekProvider = provider as? DeepSeekProvider else { return }
+        guard let config = KeychainService.shared.load(providerId: provider.id),
+              let platformToken = config.platformToken, !platformToken.isEmpty else {
+            monthlyTrend = []
+            monthlyTrendErrorMessage = nil
+            return
+        }
+
+        isMonthlyTrendLoading = true
+        monthlyTrendErrorMessage = nil
+
+        let calendar = Calendar.current
+        let now = Date()
+        var collected: [(Date, Double, String)] = []
+
+        await withTaskGroup(of: (Int, Int, Double?, String?).self) { group in
+            for offset in (0...monthsBack).reversed() {
+                guard let monthDate = calendar.date(byAdding: .month, value: -offset, to: now) else { continue }
+                let month = calendar.component(.month, from: monthDate)
+                let year = calendar.component(.year, from: monthDate)
+                group.addTask {
+                    do {
+                        let usage = try await deepseekProvider.fetchPlatformUsage(month: month, year: year)
+                        return (usage.year, usage.month, usage.totalConsumption, usage.currency)
+                    } catch {
+                        return (year, month, nil, nil)
+                    }
+                }
+            }
+
+            for await (year, month, consumption, currency) in group {
+                guard let consumption, let currency else { continue }
+                let monthDate = calendar.date(from: DateComponents(year: year, month: month, day: 1)) ?? Date()
+                collected.append((monthDate, consumption, currency))
+            }
+        }
+
+        collected.sort { $0.0 < $1.0 }
+        monthlyTrend = collected.map { MonthlyConsumptionPoint(month: $0.0, consumption: $0.1, currency: $0.2) }
+        isMonthlyTrendLoading = false
     }
 
     func refreshDistribution() async {
