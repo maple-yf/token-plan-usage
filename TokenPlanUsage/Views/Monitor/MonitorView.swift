@@ -120,8 +120,6 @@ private struct MonitorProviderView: View {
                     )
                     .padding()
                 }
-            } else if viewModel.isPlatformUsageLoading || viewModel.isLoading {
-                loadingSkeleton
             } else if let error = viewModel.platformUsageErrorMessage {
                 VStack(spacing: 16) {
                     errorOverlay
@@ -202,10 +200,8 @@ private struct MonitorProviderView: View {
                         }
                     } else if viewModel.errorMessage != nil {
                         errorOverlay
-                    } else if !viewModel.isLoading {
-                        noProviderState
                     } else {
-                        loadingSkeleton
+                        noProviderState
                     }
                 }
                 .padding()
@@ -275,53 +271,6 @@ private struct MonitorProviderView: View {
         }
         .padding(40)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-    }
-
-    // MARK: - Loading Skeleton
-
-    private var loadingSkeleton: some View {
-        VStack(spacing: 20) {
-            Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 18)
-                .frame(width: 180, height: 180)
-                .overlay {
-                    VStack(spacing: 4) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: 80, height: 28)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.15))
-                            .frame(width: 40, height: 14)
-                    }
-                }
-
-            HStack(spacing: 0) {
-                skeletonDetailItem
-                skeletonDetailItem
-                skeletonDetailItem
-            }
-            .padding(.vertical, 16)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-
-            ProgressView()
-                .padding(.top, 8)
-        }
-        .padding()
-    }
-
-    private var skeletonDetailItem: some View {
-        VStack(spacing: 6) {
-            Circle()
-                .fill(Color.gray.opacity(0.15))
-                .frame(width: 20, height: 20)
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 50, height: 20)
-            RoundedRectangle(cornerRadius: 3)
-                .fill(Color.gray.opacity(0.15))
-                .frame(width: 36, height: 12)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - No Provider State
