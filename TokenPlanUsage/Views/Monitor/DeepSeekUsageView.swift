@@ -118,15 +118,27 @@ struct DeepSeekUsageView: View {
                     .font(.subheadline)
             }
 
-            DatePicker("", selection: $selectedMonth, displayedComponents: [.date])
-                .datePickerStyle(.compact)
-                .labelsHidden()
-                .onChange(of: selectedMonth) { _, newDate in
-                    let calendar = Calendar.current
-                    let month = calendar.component(.month, from: newDate)
-                    let year = calendar.component(.year, from: newDate)
-                    onMonthChange?(month, year)
+            Picker("年", selection: yearBinding) {
+                ForEach(availableYears, id: \.self) { year in
+                    Text("\(String(year))年").tag(year)
                 }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+
+            Picker("月", selection: monthBinding) {
+                ForEach(1...12, id: \.self) { month in
+                    Text("\(month)月").tag(month)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .onChange(of: selectedMonth) { _, newDate in
+                let calendar = Calendar.current
+                let month = calendar.component(.month, from: newDate)
+                let year = calendar.component(.year, from: newDate)
+                onMonthChange?(month, year)
+            }
 
             Button {
                 changeMonth(by: 1)
@@ -166,6 +178,35 @@ struct DeepSeekUsageView: View {
         let month = Calendar.current.component(.month, from: newDate)
         let year = Calendar.current.component(.year, from: newDate)
         onMonthChange?(month, year)
+    }
+
+    private var availableYears: [Int] {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return Array((currentYear - 5)...currentYear)
+    }
+
+    private var yearBinding: Binding<Int> {
+        Binding(
+            get: { Calendar.current.component(.year, from: selectedMonth) },
+            set: { newYear in
+                let calendar = Calendar.current
+                let month = calendar.component(.month, from: selectedMonth)
+                let newDate = calendar.date(from: DateComponents(year: newYear, month: month, day: 1)) ?? selectedMonth
+                selectedMonth = newDate
+            }
+        )
+    }
+
+    private var monthBinding: Binding<Int> {
+        Binding(
+            get: { Calendar.current.component(.month, from: selectedMonth) },
+            set: { newMonth in
+                let calendar = Calendar.current
+                let year = calendar.component(.year, from: selectedMonth)
+                let newDate = calendar.date(from: DateComponents(year: year, month: newMonth, day: 1)) ?? selectedMonth
+                selectedMonth = newDate
+            }
+        )
     }
 
     // MARK: - Charts Section
