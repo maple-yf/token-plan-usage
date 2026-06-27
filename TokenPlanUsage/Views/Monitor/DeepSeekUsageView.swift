@@ -22,12 +22,13 @@ struct DeepSeekUsageView: View {
         return f
     }()
 
-    /// Used for the first x-axis tick so the user can see which year the
-    /// trend starts in (e.g. "2025年12月"); remaining ticks stay as "M月".
-    private static let chineseYearMonthFormatter: DateFormatter = {
+    /// Used for the standalone year label on the left of the x-axis so the
+    /// user can see which year the trend starts in (e.g. "2025年"); the
+    /// tick labels themselves stay as "M月" to avoid overlap.
+    private static let chineseYearOnlyFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = Locale(identifier: "zh_CN")
-        f.dateFormat = "yyyy年M月"
+        f.dateFormat = "yyyy年"
         return f
     }()
 
@@ -568,22 +569,36 @@ struct DeepSeekUsageView: View {
                     .symbolSize(50)
                 }
                 .chartXAxis {
-                    let firstMonth = monthlyTrend.first?.month
                     AxisMarks(values: .stride(by: .month)) { value in
                         AxisValueLabel {
                             if let date = value.as(Date.self) {
-                                Group {
-                                    if let firstMonth,
-                                       Calendar.current.isDate(date, equalTo: firstMonth, toGranularity: .month) {
-                                        Text(Self.chineseYearMonthFormatter.string(from: date))
-                                    } else {
-                                        Text(Self.chineseMonthFormatter.string(from: date))
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .center)
+                                Text(Self.chineseMonthFormatter.string(from: date))
+                                    .frame(maxWidth: .infinity, alignment: .center)
                             }
                         }
                         .font(.caption2)
+                    }
+                }
+                .chartOverlay { proxy in
+                    if let firstDate = monthlyTrend.first?.month,
+                       let plotAnchor = proxy.plotFrame {
+                        GeometryReader { geo in
+                            let plotFrame = geo[plotAnchor]
+                            if let xPos = proxy.position(forX: firstDate) {
+                                // Year label sits to the left of the first
+                                // tick at the same baseline as the x-axis
+                                // labels, so it doesn't collide with the
+                                // first/second month.
+                                Text(Self.chineseYearOnlyFormatter.string(from: firstDate))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
+                                    .position(
+                                        x: max(plotFrame.minX + 14, plotFrame.minX + xPos - 32),
+                                        y: geo.size.height - 10
+                                    )
+                            }
+                        }
                     }
                 }
                 .chartYAxis {
@@ -623,18 +638,87 @@ struct DeepSeekUsageView: View {
 
     // MARK: - Loading / Error / Empty
 
+    /// Mirrors the real chartsSection / modelDetailSection / tokenBreakdownSection
+    /// layout with shimmering placeholders so the loading state visually matches
+    /// the eventual content. Four chart placeholders (consumption, monthly trend,
+    /// api requests, tokens), then the model list and the token breakdown rows.
     private var loadingCharts: some View {
         VStack(spacing: 12) {
-            ForEach(0..<3, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.quaternary)
-                    .frame(height: 150)
-                    .overlay {
-                        ProgressView()
-                            .tint(.secondary)
-                    }
+            ForEach(0..<4, id: \.self) { _ in
+                skeletonChart
+            }
+            skeletonModelDetail
+            skeletonTokenBreakdown
+        }
+    }
+
+    private var skeletonChart: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SkeletonView(cornerRadius: 4).frame(width: 100, height: 14)
+            SkeletonView(cornerRadius: 12).frame(height: 150)
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var skeletonModelDetail: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SkeletonView(cornerRadius: 4).frame(width: 80, height: 14)
+            ForEach(0..<2, id: \.self) { _ in
+                skeletonModelRow
             }
         }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var skeletonModelRow: some View {
+        VStack(spacing: 8) {
+            HStack {
+                SkeletonView(cornerRadius: 4).frame(width: 120, height: 12)
+                Spacer()
+            }
+            HStack(spacing: 0) {
+                ForEach(0..<3, id: \.self) { _ in
+                    VStack(spacing: 2) {
+                        SkeletonView(cornerRadius: 4).frame(width: 50, height: 14)
+                        SkeletonView(cornerRadius: 3).frame(width: 36, height: 10)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            HStack(spacing: 6) {
+                ForEach(0..<3, id: \.self) { _ in
+                    HStack(spacing: 2) {
+                        Circle().fill(.quaternary).frame(width: 5, height: 5)
+                        SkeletonView(cornerRadius: 3).frame(width: 28, height: 10)
+                        SkeletonView(cornerRadius: 3).frame(width: 36, height: 10)
+                    }
+                }
+            }
+        }
+        .padding(10)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var skeletonTokenBreakdown: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SkeletonView(cornerRadius: 4).frame(width: 80, height: 14)
+            HStack(spacing: 12) {
+                ForEach(0..<3, id: \.self) { _ in
+                    VStack(spacing: 4) {
+                        HStack(spacing: 4) {
+                            Circle().fill(.quaternary).frame(width: 8, height: 8)
+                            SkeletonView(cornerRadius: 3).frame(width: 60, height: 10)
+                        }
+                        SkeletonView(cornerRadius: 4).frame(width: 50, height: 14)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
     private func errorCard(_ msg: String) -> some View {
@@ -766,6 +850,45 @@ struct DeepSeekUsageView: View {
             Text(label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Skeleton
+
+/// Shimmering placeholder used by the loading skeleton. Renders a base
+/// gray bar with a translucent gradient sweeping left-to-right, so the
+/// eye reads it as "loading" rather than a static empty box. The phase
+/// range (-0.5 → 1.5) keeps the gradient off-screen at both ends of the
+/// loop, hiding the repeat jump.
+private struct SkeletonView: View {
+    let cornerRadius: CGFloat
+    @State private var phase: CGFloat = -0.5
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Color.gray.opacity(0.15)
+
+                LinearGradient(
+                    colors: [
+                        Color.gray.opacity(0.0),
+                        Color.gray.opacity(0.3),
+                        Color.gray.opacity(0.0)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: geo.size.width * 0.5)
+                .offset(x: phase * geo.size.width)
+            }
+            .clipped()
+        }
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .onAppear {
+            withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                phase = 1.5
+            }
         }
     }
 }
