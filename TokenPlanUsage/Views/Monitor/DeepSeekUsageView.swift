@@ -15,6 +15,22 @@ struct DeepSeekUsageView: View {
     @State private var selectedMonth: Date
     @State private var selectedDataPoint: DeepSeekDailyUsage?
 
+    private static let chineseMonthFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "zh_CN")
+        f.dateFormat = "M月"
+        return f
+    }()
+
+    /// Used for the first x-axis tick so the user can see which year the
+    /// trend starts in (e.g. "2025年12月"); remaining ticks stay as "M月".
+    private static let chineseYearMonthFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "zh_CN")
+        f.dateFormat = "yyyy年M月"
+        return f
+    }()
+
     init(usage: DeepSeekPlatformUsage, balance: DeepSeekBalance?, isLoading: Bool, errorMessage: String?, monthlyTrend: [MonthlyConsumptionPoint], isMonthlyTrendLoading: Bool, monthlyTrendErrorMessage: String?, onRefresh: (() -> Void)?, onMonthChange: ((Int, Int) -> Void)?) {
         self.usage = usage
         self.balance = balance
@@ -47,7 +63,6 @@ struct DeepSeekUsageView: View {
                     modelDetailSection
                     tokenBreakdownSection
                 }
-                monthlyTrendSection
             }
             .padding()
         }
@@ -71,25 +86,30 @@ struct DeepSeekUsageView: View {
                 }
             }
 
-            Divider()
-
-            HStack(spacing: 0) {
-                summaryItem(
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                spacing: 12
+            ) {
+                statCard(
+                    icon: "creditcard.fill",
                     title: "充值余额",
                     value: balance.flatMap { "\($0.currency) \($0.totalBalance)" } ?? "---",
                     color: .green
                 )
-                summaryItem(
+                statCard(
+                    icon: "yensign.circle.fill",
                     title: "本月消费",
                     value: String(format: "%@ %.2f", usage.currency, usage.totalConsumption),
                     color: .orange
                 )
-                summaryItem(
+                statCard(
+                    icon: "square.stack.3d.up.fill",
                     title: "总 Tokens",
                     value: formatTokenCount(Int(usage.totalTokens)),
                     color: .purple
                 )
-                summaryItem(
+                statCard(
+                    icon: "arrow.triangle.branch",
                     title: "总请求数",
                     value: "\(Int(usage.totalRequests))",
                     color: .blue
@@ -100,24 +120,31 @@ struct DeepSeekUsageView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func summaryItem(title: String, value: String, color: Color) -> some View {
-        VStack(spacing: 4) {
+    private func statCard(icon: String, title: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.caption)
+                    .foregroundStyle(color)
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.title3.weight(.bold))
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Month Selector
 
     private var monthSelector: some View {
-        HStack {
+        HStack(spacing: 8) {
             Button {
                 changeMonth(by: -1)
             } label: {
@@ -132,6 +159,7 @@ struct DeepSeekUsageView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
+            .fixedSize()
 
             Picker("月", selection: monthBinding) {
                 ForEach(1...12, id: \.self) { month in
@@ -140,6 +168,7 @@ struct DeepSeekUsageView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
+            .fixedSize()
             .onChange(of: selectedMonth) { _, newDate in
                 let calendar = Calendar.current
                 let month = calendar.component(.month, from: newDate)
@@ -156,14 +185,6 @@ struct DeepSeekUsageView: View {
             .disabled(isCurrentMonth)
 
             Spacer()
-
-            Button {
-                // Export placeholder
-            } label: {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -221,6 +242,7 @@ struct DeepSeekUsageView: View {
     private var chartsSection: some View {
         VStack(spacing: 12) {
             consumptionBarChart
+            monthlyTrendSection
             apiRequestChart
             tokenStackedBarChart
         }
@@ -546,9 +568,22 @@ struct DeepSeekUsageView: View {
                     .symbolSize(50)
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .month)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated), centered: true)
-                            .font(.caption2)
+                    let firstMonth = monthlyTrend.first?.month
+                    AxisMarks(values: .stride(by: .month)) { value in
+                        AxisValueLabel {
+                            if let date = value.as(Date.self) {
+                                Group {
+                                    if let firstMonth,
+                                       Calendar.current.isDate(date, equalTo: firstMonth, toGranularity: .month) {
+                                        Text(Self.chineseYearMonthFormatter.string(from: date))
+                                    } else {
+                                        Text(Self.chineseMonthFormatter.string(from: date))
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                        }
+                        .font(.caption2)
                     }
                 }
                 .chartYAxis {
