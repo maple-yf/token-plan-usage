@@ -183,4 +183,162 @@ final class GLMProviderTests: XCTestCase {
         XCTAssertEqual(snapshot.totalCount, 0)
         XCTAssertTrue(snapshot.planName.contains("GLM-5.1"))
     }
+
+    // MARK: - Non-Coding-Plan balance (GLMBalance)
+
+    /// Helper: mock each request by URL substring. Pass `nil` to fall back
+    /// to a JSON success response (use for endpoints that aren't asserted).
+    private func mockPerEndpoint(
+        balanceJSON: String?,
+        modelUsageJSON: String
+    ) {
+        let balanceData = balanceJSON?.data(using: .utf8)
+        MockURLProtocol.requestHandler = { request in
+            let urlString = request.url?.absoluteString ?? ""
+            let url = URL(string: urlString)!
+            let body: Data
+            if urlString.contains("/api/finance/balance/list") {
+                guard let data = balanceData else {
+                    return (data: Data(),
+                            response: HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!,
+                            error: nil)
+                }
+                body = data
+            } else {
+                body = modelUsageJSON.data(using: .utf8)!
+            }
+            return (data: body,
+                    response: HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    error: nil)
+        }
+    }
+
+    func testFetchBalanceParsesAvailableBalanceField() async throws {
+        mockPerEndpoint(
+            balanceJSON: """
+            {
+              "code": 200,
+              "data": {
+                "availableBalance": "100.50",
+                "currency": "CNY"
+              }
+            }
+            """,
+            modelUsageJSON: """
+            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
+            """
+        )
+
+        let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(balance.currency, "CNY")
+        XCTAssertEqual(balance.amount, "100.50")
+    }
+
+    func testFetchBalanceFallsBackToBalanceField() async throws {
+        mockPerEndpoint(
+            balanceJSON: """
+            {
+              "code": 200,
+              "data": {
+                "balance": "42.00"
+              }
+            }
+            """,
+            modelUsageJSON: """
+            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
+            """
+        )
+
+        let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(balance.currency, "CNY")
+        XCTAssertEqual(balance.amount, "42.00")
+    }
+
+    func testFetchBalanceDefaultsCurrencyToCNY() async throws {
+        mockPerEndpoint(
+            balanceJSON: """
+            { "code": 200, "data": { "availableBalance": "5.00" } }
+            """,
+            modelUsageJSON: """
+            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
+            """
+        )
+
+        let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(balance.currency, "CNY")
+        XCTAssertEqual(balance.amount, "5.00")
+    }
+
+    func testFetchBalanceThrowsOnNon200Status() async throws {
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url ?? URL(string: "https://api.z.ai")!
+            return (data: Data(),
+                    response: HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!,
+                    error: nil)
+        }
+
+        do {
+            _ = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
+            XCTFail("Should have thrown")
+        } catch TokenProviderError.serverError {
+            // expected
+        } catch {
+            XCTFail("Wrong error: \(error)")
+        }
+    }
+
+    func testFetchUsageAttachesBalanceWhenAvailable() async throws {
+        mockPerEndpoint(
+            balanceJSON: """
+            { "code": 200, "data": { "availableBalance": "99.99", "currency": "CNY" } }
+            """,
+            modelUsageJSON: """
+            {
+              "code": 200,
+              "success": true,
+              "data": {
+                "totalUsage": {
+                  "totalModelCallCount": 5,
+                  "totalTokensUsage": 1000,
+                  "modelSummaryList": [
+                    {"modelName": "GLM-5.1", "totalTokens": 1000}
+                  ]
+                }
+              }
+            }
+            """
+        )
+
+        let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
+        XCTAssertNotNil(snapshot.glmBalance)
+        XCTAssertEqual(snapshot.glmBalance?.amount, "99.99")
+        XCTAssertEqual(snapshot.glmBalance?.currency, "CNY")
+    }
+
+    func testFetchUsageLeavesBalanceNilWhenEndpointFails() async throws {
+        // balanceJSON = nil → mock returns 500 for the balance endpoint.
+        // The model-usage endpoint still succeeds, so the snapshot should
+        // still build (balance gracefully nil).
+        mockPerEndpoint(
+            balanceJSON: nil,
+            modelUsageJSON: """
+            {
+              "code": 200,
+              "success": true,
+              "data": {
+                "totalUsage": {
+                  "totalModelCallCount": 1,
+                  "totalTokensUsage": 10,
+                  "modelSummaryList": [
+                    {"modelName": "GLM-5.1", "totalTokens": 10}
+                  ]
+                }
+              }
+            }
+            """
+        )
+
+        let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
+        XCTAssertNil(snapshot.glmBalance)
+    }
 }

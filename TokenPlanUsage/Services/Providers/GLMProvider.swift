@@ -12,9 +12,13 @@ class GLMProvider: TokenProvider {
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
         let base = baseURL ?? defaultBaseURL
 
-        // Fetch model usage only — quota is fetched separately in Settings and not
-        // needed for the Monitor tab's core functionality (snapshot + distribution).
-        let modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey)
+        // Fetch model usage (Coding Plan) and the non-Coding Plan account
+        // balance in parallel. The balance call is allowed to fail without
+        // failing the whole snapshot — the Coding Plan view still works.
+        async let modelUsageTask = fetchModelUsage(base: base, apiKey: apiKey)
+        let balance = await fetchBalanceBestEffort(apiKey: apiKey, baseURL: base)
+
+        let modelUsage = try await modelUsageTask
 
         // Extract data from model usage
         let totalUsage = modelUsage.data?.totalUsage
@@ -43,8 +47,69 @@ class GLMProvider: TokenProvider {
             fetchedAt: Date(),
             status: .normal,
             mcpQuota: mcpQuota,
-            modelQuotas: nil
+            modelQuotas: nil,
+            glmBalance: balance
         )
+    }
+
+    /// Wraps `fetchBalance` so a failure returns `nil` instead of throwing.
+    /// Lets the snapshot succeed even when the balance endpoint is down
+    /// or the user's GLM account doesn't have one configured.
+    private func fetchBalanceBestEffort(apiKey: String, baseURL: String?) async -> GLMBalance? {
+        do {
+            return try await fetchBalance(apiKey: apiKey, baseURL: baseURL)
+        } catch {
+            return nil
+        }
+    }
+
+    /// Fetches the non-Coding Plan account balance from
+    /// `GET /api/finance/balance/list`. This endpoint is separate from the
+    /// Coding Plan quota limit and reports the actual money left in the
+    /// user's GLM account.
+    ///
+    /// The response is expected to look like
+    /// `{"code": 200, "data": {"availableBalance": "100.50", "currency": "CNY"}}`
+    /// but the parser tolerates a few common field aliases (`balance` /
+    /// `amount`) and a missing `currency` (defaults to CNY). Adjust the
+    /// field names here if the live API returns a different shape.
+    func fetchBalance(apiKey: String, baseURL: String?) async throws -> GLMBalance {
+        let base = baseURL ?? defaultBaseURL
+        guard let url = URL(string: "\(base)/api/finance/balance/list") else {
+            throw TokenProviderError.invalidResponse
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 15
+
+        let (data, response) = try await urlSession.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw TokenProviderError.invalidResponse
+        }
+        if http.statusCode == 401 { throw TokenProviderError.invalidAPIKey }
+        guard http.statusCode == 200 else {
+            throw TokenProviderError.serverError(http.statusCode)
+        }
+
+        let resp: GLMBalanceResponse
+        do {
+            resp = try JSONDecoder().decode(GLMBalanceResponse.self, from: data)
+        } catch {
+            throw TokenProviderError.invalidResponse
+        }
+
+        if resp.code == 401 { throw TokenProviderError.invalidAPIKey }
+        guard resp.code == 200 || resp.code == 0 else {
+            throw TokenProviderError.serverError(resp.code ?? -1)
+        }
+        guard let payload = resp.data else {
+            throw TokenProviderError.invalidResponse
+        }
+
+        let amount = payload.availableBalance ?? payload.balance ?? payload.amount ?? "0.00"
+        return GLMBalance(currency: payload.currency ?? "CNY", amount: amount)
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
@@ -218,6 +283,23 @@ struct GLMQuotaLimitResponse: Decodable {
             case nextResetTime = "nextResetTime"
             case currentValue = "currentValue"
         }
+    }
+}
+
+/// Response of `GET /api/finance/balance/list`. The parser inside
+/// `fetchBalance` tries `availableBalance` first, then `balance`, then
+/// `amount` — see the doc comment on `fetchBalance` for the expected
+/// shape and the rationale.
+struct GLMBalanceResponse: Decodable {
+    let code: Int?
+    let msg: String?
+    let data: Payload?
+
+    struct Payload: Decodable {
+        let availableBalance: String?
+        let balance: String?
+        let amount: String?
+        let currency: String?
     }
 }
 

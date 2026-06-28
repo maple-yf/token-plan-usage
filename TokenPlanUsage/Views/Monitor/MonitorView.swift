@@ -178,6 +178,13 @@ private struct MonitorProviderView: View {
                     if let snapshot = viewModel.snapshot {
                         staleDataWarning(snapshot: snapshot)
 
+                        // GLM-specific: account balance from the non-Coding-Plan
+                        // finance endpoint. Shown above the ring so the user sees
+                        // their real money first, then the Coding Plan below.
+                        if let glmBalance = snapshot.glmBalance {
+                            glmBalanceCard(currency: glmBalance.currency, amount: glmBalance.amount)
+                        }
+
                         RingProgressView(
                             progress: snapshot.remainingPercent,
                             usedCount: snapshot.usedCount,
@@ -318,6 +325,32 @@ private struct MonitorProviderView: View {
                 Task { await viewModel.refreshDistribution() }
             }
         )
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    // MARK: - GLM Balance Card
+
+    private func glmBalanceCard(currency: String, amount: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "creditcard.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.green)
+                Text("账户余额")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text("非 Coding Plan")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Text("\(currency) \(amount)")
+                .font(.title.weight(.bold))
+                .foregroundStyle(.green)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
