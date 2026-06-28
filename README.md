@@ -30,7 +30,6 @@
 - **MCP 工具配额** — GLM 专属 MCP 工具调用次数跟踪
 - **多模型用量明细** — MiniMax 各子模型独立计数（speech-hd、MiniMax-M\*、coding-plan-vim 等）
 - **用量趋势图表** — 历史用量折线图，直观掌握消耗节奏
-- **iOS 桌面小组件** — Widget 显示选定 Provider 的额度概览
 - **安全存储** — API Key 通过 Keychain 安全存储
 - **自动刷新** — 支持 5/10/15 分钟间隔或手动刷新
 
@@ -39,7 +38,6 @@
 - Swift / SwiftUI
 - iOS 17+
 - XcodeGen（`project.yml` 生成 Xcode 工程）
-- WidgetKit
 - Keychain Services
 
 ## 构建

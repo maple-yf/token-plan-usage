@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-Token Plan Usage 是一款 iOS App，用于监控 AI 服务提供商（MiniMax、智谱 GLM、DeepSeek）的 API 额度用量。技术栈为 Swift / SwiftUI（iOS 17+），使用 XcodeGen（`project.yml`）生成 Xcode 工程，并包含 WidgetKit 桌面小组件。
+Token Plan Usage 是一款 iOS App，用于监控 AI 服务提供商（MiniMax、智谱 GLM、DeepSeek）的 API 额度用量。技术栈为 Swift / SwiftUI（iOS 17+），使用 XcodeGen（`project.yml`）生成 Xcode 工程。
 
 详见 [README.md](README.md)。
 
@@ -14,7 +14,7 @@ Token Plan Usage 是一款 iOS App，用于监控 AI 服务提供商（MiniMax�
 
 ### 用途
 - 在本地运行 App 或运行测试时，可直接读取该文件中的凭据，免去手工配置。
-- 用于验证各 Provider 接口请求 / 响应解析逻辑、UI 渲染、Widget 展示等。
+- 用于验证各 Provider 接口请求 / 响应解析逻辑、UI 渲染等。
 
 ### 安全约定（务必遵守）
 - ⚠️ **该文件包含真实可用的密钥，属于敏感数据。**

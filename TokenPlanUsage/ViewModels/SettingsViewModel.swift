@@ -8,7 +8,6 @@ class SettingsViewModel {
         ProviderConfig.deepseek
     ]
     var refreshInterval: TimeInterval = 5 * 60 // 5 minutes
-    var widgetProvider: String = "minimax"
     var baseURLValidationError: String?
 
     private let keychainService = KeychainService.shared

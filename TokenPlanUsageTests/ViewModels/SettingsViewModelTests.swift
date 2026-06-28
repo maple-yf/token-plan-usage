@@ -32,7 +32,6 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(vm.providers[1].id, "glm")
         XCTAssertEqual(vm.providers[2].id, "deepseek")
         XCTAssertEqual(vm.refreshInterval, 300)
-        XCTAssertEqual(vm.widgetProvider, "minimax")
     }
 
     // MARK: - Provider Updates
@@ -140,10 +139,5 @@ final class SettingsViewModelTests: XCTestCase {
     func testRefreshInterval() {
         vm.refreshInterval = 10 * 60
         XCTAssertEqual(vm.refreshInterval, 600)
-    }
-
-    func testWidgetProvider() {
-        vm.widgetProvider = "glm"
-        XCTAssertEqual(vm.widgetProvider, "glm")
     }
 }

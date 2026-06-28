@@ -3,7 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     @State private var viewModel = SettingsViewModel()
     @State private var selectedRefreshInterval: TimeInterval = 300
-    @State private var selectedWidgetProvider = SharedStore.shared.loadWidgetProvider()
 
     private let refreshOptions: [(String, TimeInterval)] = [
         ("5分钟", 300),
@@ -31,24 +30,6 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                }
-                .padding()
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-
-                // Widget provider
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Widget 显示 Provider")
-                        .font(.subheadline.weight(.semibold))
-
-                    Picker("Provider", selection: $selectedWidgetProvider) {
-                        ForEach(viewModel.providers.filter { $0.isEnabled }) { provider in
-                            Text(provider.id.uppercased()).tag(provider.id)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .onChange(of: selectedWidgetProvider) { _, newValue in
-                        SharedStore.shared.saveWidgetProvider(newValue)
-                    }
                 }
                 .padding()
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))

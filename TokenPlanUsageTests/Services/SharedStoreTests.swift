@@ -66,20 +66,6 @@ final class SharedStoreTests: XCTestCase {
         XCTAssertEqual(loaded2?.totalCount, 150)
     }
 
-    func testSaveAndLoadWidgetProvider() {
-        SharedStore.shared.saveWidgetProvider("glm")
-        XCTAssertEqual(SharedStore.shared.loadWidgetProvider(), "glm")
-
-        SharedStore.shared.saveWidgetProvider("minimax")
-        XCTAssertEqual(SharedStore.shared.loadWidgetProvider(), "minimax")
-    }
-
-    func testLoadWidgetProviderDefaultsToMinimax() {
-        // Clear any stored value
-        SharedStore.shared.saveWidgetProvider("minimax")
-        XCTAssertEqual(SharedStore.shared.loadWidgetProvider(), "minimax")
-    }
-
     // MARK: - Provider Visibility
 
     private func resetVisibleProviders() {
