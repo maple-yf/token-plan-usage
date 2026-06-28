@@ -123,6 +123,13 @@ private struct MonitorProviderView: View {
                     )
                     .padding()
                 }
+            } else if viewModel.isPlatformUsageLoading || viewModel.isLoading {
+                // Initial load: platformUsage hasn't arrived yet, so render
+                // the full skeleton before DeepSeekUsageView has data to bind to.
+                ScrollView {
+                    DeepSeekUsageView.loadingView
+                        .padding()
+                }
             } else if let error = viewModel.platformUsageErrorMessage {
                 VStack(spacing: 16) {
                     errorOverlay

@@ -22,16 +22,6 @@ struct DeepSeekUsageView: View {
         return f
     }()
 
-    /// Used for the standalone year label on the left of the x-axis so the
-    /// user can see which year the trend starts in (e.g. "2025年"); the
-    /// tick labels themselves stay as "M月" to avoid overlap.
-    private static let chineseYearOnlyFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "zh_CN")
-        f.dateFormat = "yyyy年"
-        return f
-    }()
-
     init(usage: DeepSeekPlatformUsage, balance: DeepSeekBalance?, isLoading: Bool, errorMessage: String?, monthlyTrend: [MonthlyConsumptionPoint], isMonthlyTrendLoading: Bool, monthlyTrendErrorMessage: String?, onRefresh: (() -> Void)?, onMonthChange: ((Int, Int) -> Void)?) {
         self.usage = usage
         self.balance = balance
@@ -579,28 +569,6 @@ struct DeepSeekUsageView: View {
                         .font(.caption2)
                     }
                 }
-                .chartOverlay { proxy in
-                    if let firstDate = monthlyTrend.first?.month,
-                       let plotAnchor = proxy.plotFrame {
-                        GeometryReader { geo in
-                            let plotFrame = geo[plotAnchor]
-                            if let xPos = proxy.position(forX: firstDate) {
-                                // Year label sits to the left of the first
-                                // tick at the same baseline as the x-axis
-                                // labels, so it doesn't collide with the
-                                // first/second month.
-                                Text(Self.chineseYearOnlyFormatter.string(from: firstDate))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .fixedSize()
-                                    .position(
-                                        x: max(plotFrame.minX + 14, plotFrame.minX + xPos - 32),
-                                        y: geo.size.height - 10
-                                    )
-                            }
-                        }
-                    }
-                }
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
                         AxisValueLabel {
@@ -638,21 +606,88 @@ struct DeepSeekUsageView: View {
 
     // MARK: - Loading / Error / Empty
 
-    /// Mirrors the real chartsSection / modelDetailSection / tokenBreakdownSection
-    /// layout with shimmering placeholders so the loading state visually matches
-    /// the eventual content. Four chart placeholders (consumption, monthly trend,
-    /// api requests, tokens), then the model list and the token breakdown rows.
-    private var loadingCharts: some View {
-        VStack(spacing: 12) {
-            ForEach(0..<4, id: \.self) { _ in
-                skeletonChart
+    /// Full-screen skeleton used for the **initial** load (when
+    /// `platformUsage` is still nil in the parent MonitorView). Mirrors the
+    /// summary card, month selector, four chart panels, model list, and
+    /// token breakdown so the user sees the eventual layout at a glance.
+    /// Exposed as a static view so the parent can render it before
+    /// `DeepSeekUsageView` itself has any data to bind to.
+    static var loadingView: some View {
+        VStack(spacing: 16) {
+            summaryCardSkeleton
+            monthSelectorSkeleton
+            VStack(spacing: 12) {
+                ForEach(0..<4, id: \.self) { _ in
+                    Self.skeletonChart
+                }
+                Self.skeletonModelDetail
+                Self.skeletonTokenBreakdown
             }
-            skeletonModelDetail
-            skeletonTokenBreakdown
         }
     }
 
-    private var skeletonChart: some View {
+    /// Mirrors the real chartsSection / modelDetailSection /
+    /// tokenBreakdownSection layout with shimmering placeholders. Used
+    /// for **refreshes** (after data has loaded at least once) — at that
+    /// point the summaryCard and monthSelector still show the previous
+    /// values, so we only skeleton the data section.
+    private var loadingCharts: some View {
+        VStack(spacing: 12) {
+            ForEach(0..<4, id: \.self) { _ in
+                Self.skeletonChart
+            }
+            Self.skeletonModelDetail
+            Self.skeletonTokenBreakdown
+        }
+    }
+
+    private static var summaryCardSkeleton: some View {
+        VStack(spacing: 12) {
+            HStack {
+                SkeletonView(cornerRadius: 4).frame(width: 80, height: 16)
+                Spacer()
+                SkeletonView(cornerRadius: 4).frame(width: 24, height: 16)
+            }
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                spacing: 12
+            ) {
+                ForEach(0..<4, id: \.self) { _ in
+                    statCardSkeleton
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private static var statCardSkeleton: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 4) {
+                SkeletonView(cornerRadius: 2).frame(width: 10, height: 10)
+                SkeletonView(cornerRadius: 2).frame(width: 40, height: 10)
+            }
+            SkeletonView(cornerRadius: 4).frame(width: 80, height: 20)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private static var monthSelectorSkeleton: some View {
+        HStack(spacing: 8) {
+            SkeletonView(cornerRadius: 12).frame(width: 24, height: 24)
+            SkeletonView(cornerRadius: 6).frame(width: 60, height: 24)
+            SkeletonView(cornerRadius: 6).frame(width: 40, height: 24)
+            SkeletonView(cornerRadius: 12).frame(width: 24, height: 24)
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private static var skeletonChart: some View {
         VStack(alignment: .leading, spacing: 8) {
             SkeletonView(cornerRadius: 4).frame(width: 100, height: 14)
             SkeletonView(cornerRadius: 12).frame(height: 150)
@@ -661,7 +696,7 @@ struct DeepSeekUsageView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
-    private var skeletonModelDetail: some View {
+    private static var skeletonModelDetail: some View {
         VStack(alignment: .leading, spacing: 12) {
             SkeletonView(cornerRadius: 4).frame(width: 80, height: 14)
             ForEach(0..<2, id: \.self) { _ in
@@ -672,7 +707,7 @@ struct DeepSeekUsageView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private var skeletonModelRow: some View {
+    private static var skeletonModelRow: some View {
         VStack(spacing: 8) {
             HStack {
                 SkeletonView(cornerRadius: 4).frame(width: 120, height: 12)
@@ -701,7 +736,7 @@ struct DeepSeekUsageView: View {
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
     }
 
-    private var skeletonTokenBreakdown: some View {
+    private static var skeletonTokenBreakdown: some View {
         VStack(alignment: .leading, spacing: 8) {
             SkeletonView(cornerRadius: 4).frame(width: 80, height: 14)
             HStack(spacing: 12) {
