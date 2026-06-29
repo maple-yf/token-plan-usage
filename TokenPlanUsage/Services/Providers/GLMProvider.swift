@@ -63,19 +63,19 @@ class GLMProvider: TokenProvider {
         }
     }
 
-    /// Fetches the non-Coding Plan account balance from
-    /// `GET /api/finance/balance/list`. This endpoint is separate from the
-    /// Coding Plan quota limit and reports the actual money left in the
-    /// user's GLM account.
+    /// Fetches the non-Coding Plan account balance snapshot from
+    /// `GET /api/biz/account/query-customer-account-report`. This is the
+    /// same endpoint the Zhipu web console uses for its "财务总览" card,
+    /// and it works for both pay-as-you-go and Coding Plan users (unlike
+    /// `/api/monitor/usage/model-usage`, which is Coding-Plan-only).
     ///
-    /// The response is expected to look like
-    /// `{"code": 200, "data": {"availableBalance": "100.50", "currency": "CNY"}}`
-    /// but the parser tolerates a few common field aliases (`balance` /
-    /// `amount`) and a missing `currency` (defaults to CNY). Adjust the
-    /// field names here if the live API returns a different shape.
+    /// All fields are optional on the wire; the parser fills in 0 / nil
+    /// for missing ones so a partial response still produces a usable
+    /// snapshot. `currency` is hardcoded to CNY because the endpoint
+    /// doesn't echo it.
     func fetchBalance(apiKey: String, baseURL: String?) async throws -> GLMBalance {
         let base = baseURL ?? defaultBaseURL
-        guard let url = URL(string: "\(base)/api/finance/balance/list") else {
+        guard let url = URL(string: "\(base)/api/biz/account/query-customer-account-report") else {
             throw TokenProviderError.invalidResponse
         }
 
@@ -104,12 +104,22 @@ class GLMProvider: TokenProvider {
         guard resp.code == 200 || resp.code == 0 else {
             throw TokenProviderError.serverError(resp.code ?? -1)
         }
-        guard let payload = resp.data else {
+        guard let report = resp.data else {
             throw TokenProviderError.invalidResponse
         }
 
-        let amount = payload.availableBalance ?? payload.balance ?? payload.amount ?? "0.00"
-        return GLMBalance(currency: payload.currency ?? "CNY", amount: amount)
+        // availableBalance and balance are usually the same value;
+        // prefer availableBalance when both are present.
+        let balance = report.availableBalance ?? report.balance ?? 0
+        return GLMBalance(
+            currency: "CNY",
+            balance: balance,
+            frozenBalance: report.frozenBalance ?? 0,
+            totalSpendAmount: report.totalSpendAmount ?? 0,
+            todaySpendAmount: report.todaySpendAmount,
+            rechargeAmount: report.rechargeAmount ?? 0,
+            giveAmount: report.giveAmount ?? 0
+        )
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
@@ -286,20 +296,22 @@ struct GLMQuotaLimitResponse: Decodable {
     }
 }
 
-/// Response of `GET /api/finance/balance/list`. The parser inside
-/// `fetchBalance` tries `availableBalance` first, then `balance`, then
-/// `amount` — see the doc comment on `fetchBalance` for the expected
-/// shape and the rationale.
+/// Response of `GET /api/biz/account/query-customer-account-report`.
+/// All numeric fields are optional on the wire so the parser can fall
+/// back to 0 / nil for any missing piece (see `GLMProvider.fetchBalance`).
 struct GLMBalanceResponse: Decodable {
     let code: Int?
     let msg: String?
-    let data: Payload?
+    let data: Report?
 
-    struct Payload: Decodable {
-        let availableBalance: String?
-        let balance: String?
-        let amount: String?
-        let currency: String?
+    struct Report: Decodable {
+        let balance: Double?
+        let availableBalance: Double?
+        let rechargeAmount: Double?
+        let giveAmount: Double?
+        let totalSpendAmount: Double?
+        let todaySpendAmount: Double?
+        let frozenBalance: Double?
     }
 }
 

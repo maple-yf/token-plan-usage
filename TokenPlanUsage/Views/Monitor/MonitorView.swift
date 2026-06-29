@@ -182,7 +182,7 @@ private struct MonitorProviderView: View {
                         // finance endpoint. Shown above the ring so the user sees
                         // their real money first, then the Coding Plan below.
                         if let glmBalance = snapshot.glmBalance {
-                            glmBalanceCard(currency: glmBalance.currency, amount: glmBalance.amount)
+                            glmBalanceCard(glmBalance)
                         }
 
                         RingProgressView(
@@ -330,8 +330,8 @@ private struct MonitorProviderView: View {
 
     // MARK: - GLM Balance Card
 
-    private func glmBalanceCard(currency: String, amount: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+    private func glmBalanceCard(_ balance: GLMBalance) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: "creditcard.fill")
                     .font(.subheadline)
@@ -343,15 +343,58 @@ private struct MonitorProviderView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
-            Text("\(currency) \(amount)")
+
+            Text("\(balance.currency) \(Self.formatCurrency(balance.balance))")
                 .font(.title.weight(.bold))
                 .foregroundStyle(.green)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
+
+            if balance.frozenBalance > 0 {
+                Text("冻结 \(balance.currency) \(Self.formatCurrency(balance.frozenBalance))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Divider()
+
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
+                spacing: 8
+            ) {
+                glmBalanceStat("累计消费", value: balance.totalSpendAmount, color: .orange)
+                glmBalanceStat("今日消费", value: balance.todaySpendAmount, color: .red, fallback: "—")
+                glmBalanceStat("累计充值", value: balance.rechargeAmount, color: .blue)
+                glmBalanceStat("累计赠送", value: balance.giveAmount, color: .purple)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func glmBalanceStat(_ title: String, value: Double?, color: Color, fallback: String = "0.00") -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            if let value {
+                Text(Self.formatCurrency(value))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            } else {
+                Text(fallback)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private static func formatCurrency(_ value: Double) -> String {
+        String(format: "%.2f", value)
     }
 
     // MARK: - Helpers

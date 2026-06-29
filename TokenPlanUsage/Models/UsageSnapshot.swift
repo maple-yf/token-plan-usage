@@ -28,14 +28,30 @@ struct MCPQuota: Codable, Equatable {
     let remainingCount: Int
 }
 
-/// GLM (智谱) non-Coding Plan account balance. Fetched separately from
-/// `/api/finance/balance/list` so the user can see the actual money left
-/// in their GLM account, independent of the Coding Plan quota.
-/// `amount` is kept as a String because the API returns it pre-formatted
-/// (e.g. "100.50") and we want to display it verbatim.
+/// GLM (智谱) non-Coding Plan account balance snapshot. Fetched from
+/// `/api/biz/account/query-customer-account-report` so the user can see
+/// the actual money state of their GLM account, independent of any
+/// Coding Plan subscription.
+///
+/// All amount fields are in `currency` (always CNY for Zhipu; the
+/// endpoint doesn't echo the currency so the provider hardcodes it).
+/// `todaySpendAmount` is nil when the account hasn't spent today or
+/// the field isn't populated server-side.
 struct GLMBalance: Codable, Equatable {
     let currency: String
-    let amount: String
+    /// Available balance right now (a.k.a. `availableBalance` / `balance`).
+    let balance: Double
+    /// Amount currently frozen (e.g. pending settlement). Usually 0.
+    let frozenBalance: Double
+    /// Cumulative spend across the lifetime of the account.
+    let totalSpendAmount: Double
+    /// Spend since 00:00 local today. `nil` when the field is absent
+    /// or the user hasn't spent today.
+    let todaySpendAmount: Double?
+    /// Cumulative top-ups (real money, not gifts).
+    let rechargeAmount: Double
+    /// Cumulative system gifts / promotional credits.
+    let giveAmount: Double
 }
 
 struct MiniMaxModelQuota: Codable, Equatable, Identifiable {

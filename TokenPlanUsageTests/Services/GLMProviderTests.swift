@@ -197,7 +197,7 @@ final class GLMProviderTests: XCTestCase {
             let urlString = request.url?.absoluteString ?? ""
             let url = URL(string: urlString)!
             let body: Data
-            if urlString.contains("/api/finance/balance/list") {
+            if urlString.contains("/api/biz/account/query-customer-account-report") {
                 guard let data = balanceData else {
                     return (data: Data(),
                             response: HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!,
@@ -213,14 +213,26 @@ final class GLMProviderTests: XCTestCase {
         }
     }
 
-    func testFetchBalanceParsesAvailableBalanceField() async throws {
+    func testFetchBalanceParsesFullReport() async throws {
+        // Mirrors the actual /api/biz/account/query-customer-account-report
+        // response shape (numeric fields, currency not echoed by API).
         mockPerEndpoint(
             balanceJSON: """
             {
               "code": 200,
+              "msg": "操作成功",
               "data": {
-                "availableBalance": "100.50",
-                "currency": "CNY"
+                "balance": 89.16,
+                "availableBalance": 89.16,
+                "rechargeAmount": 12.0,
+                "giveAmount": 100.0,
+                "totalSpendAmount": 22.84,
+                "todaySpendAmount": 1.50,
+                "frozenBalance": 0.5,
+                "creditBalance": null,
+                "creditStatus": "NOT_OPEN",
+                "modelSpendAmountList": null,
+                "isKA": false
               }
             }
             """,
@@ -231,16 +243,47 @@ final class GLMProviderTests: XCTestCase {
 
         let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
         XCTAssertEqual(balance.currency, "CNY")
-        XCTAssertEqual(balance.amount, "100.50")
+        XCTAssertEqual(balance.balance, 89.16, accuracy: 0.0001)
+        XCTAssertEqual(balance.frozenBalance, 0.5, accuracy: 0.0001)
+        XCTAssertEqual(balance.totalSpendAmount, 22.84, accuracy: 0.0001)
+        XCTAssertEqual(balance.todaySpendAmount ?? 0, 1.50, accuracy: 0.0001)
+        XCTAssertEqual(balance.rechargeAmount, 12.0, accuracy: 0.0001)
+        XCTAssertEqual(balance.giveAmount, 100.0, accuracy: 0.0001)
     }
 
-    func testFetchBalanceFallsBackToBalanceField() async throws {
+    func testFetchBalanceHandlesMissingOptionalFields() async throws {
+        // Endpoint returns just `availableBalance`; everything else is missing.
+        // The parser must default missing fields to 0 / nil without throwing.
+        mockPerEndpoint(
+            balanceJSON: """
+            { "code": 200, "data": { "availableBalance": 42.0 } }
+            """,
+            modelUsageJSON: """
+            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
+            """
+        )
+
+        let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
+        XCTAssertEqual(balance.balance, 42.0, accuracy: 0.0001)
+        XCTAssertEqual(balance.frozenBalance, 0)
+        XCTAssertEqual(balance.totalSpendAmount, 0)
+        XCTAssertNil(balance.todaySpendAmount)
+        XCTAssertEqual(balance.rechargeAmount, 0)
+        XCTAssertEqual(balance.giveAmount, 0)
+    }
+
+    func testFetchBalancePreservesNullTodaySpendAmount() async throws {
+        // todaySpendAmount is the one field that's allowed to be null even
+        // on a healthy account (e.g. user hasn't spent today) — make sure
+        // it doesn't silently get coerced to 0.
         mockPerEndpoint(
             balanceJSON: """
             {
               "code": 200,
               "data": {
-                "balance": "42.00"
+                "availableBalance": 89.16,
+                "totalSpendAmount": 22.84,
+                "todaySpendAmount": null
               }
             }
             """,
@@ -250,23 +293,8 @@ final class GLMProviderTests: XCTestCase {
         )
 
         let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
-        XCTAssertEqual(balance.currency, "CNY")
-        XCTAssertEqual(balance.amount, "42.00")
-    }
-
-    func testFetchBalanceDefaultsCurrencyToCNY() async throws {
-        mockPerEndpoint(
-            balanceJSON: """
-            { "code": 200, "data": { "availableBalance": "5.00" } }
-            """,
-            modelUsageJSON: """
-            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
-            """
-        )
-
-        let balance = try await provider.fetchBalance(apiKey: "test", baseURL: nil)
-        XCTAssertEqual(balance.currency, "CNY")
-        XCTAssertEqual(balance.amount, "5.00")
+        XCTAssertNil(balance.todaySpendAmount)
+        XCTAssertEqual(balance.balance, 89.16, accuracy: 0.0001)
     }
 
     func testFetchBalanceThrowsOnNon200Status() async throws {
@@ -290,7 +318,14 @@ final class GLMProviderTests: XCTestCase {
     func testFetchUsageAttachesBalanceWhenAvailable() async throws {
         mockPerEndpoint(
             balanceJSON: """
-            { "code": 200, "data": { "availableBalance": "99.99", "currency": "CNY" } }
+            {
+              "code": 200,
+              "data": {
+                "availableBalance": 89.16,
+                "totalSpendAmount": 22.84,
+                "giveAmount": 100.0
+              }
+            }
             """,
             modelUsageJSON: """
             {
@@ -310,9 +345,10 @@ final class GLMProviderTests: XCTestCase {
         )
 
         let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
-        XCTAssertNotNil(snapshot.glmBalance)
-        XCTAssertEqual(snapshot.glmBalance?.amount, "99.99")
-        XCTAssertEqual(snapshot.glmBalance?.currency, "CNY")
+        let glmBalance = try XCTUnwrap(snapshot.glmBalance)
+        XCTAssertEqual(glmBalance.balance, 89.16, accuracy: 0.0001)
+        XCTAssertEqual(glmBalance.totalSpendAmount, 22.84, accuracy: 0.0001)
+        XCTAssertEqual(glmBalance.giveAmount, 100.0, accuracy: 0.0001)
     }
 
     func testFetchUsageLeavesBalanceNilWhenEndpointFails() async throws {
