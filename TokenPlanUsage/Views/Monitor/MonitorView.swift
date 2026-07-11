@@ -191,6 +191,8 @@ private struct MonitorProviderView: View {
                             totalCount: snapshot.totalCount,
                             planName: snapshot.planName,
                             remainingTimeString: formatRemainingTime(snapshot.refreshTime),
+                            providerId: snapshot.providerId,
+                            refreshTime: snapshot.refreshTime,
                             onRefresh: { Task { await viewModel.refresh() } }
                         )
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))

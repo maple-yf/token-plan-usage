@@ -6,9 +6,31 @@ struct RingProgressView: View {
     let totalCount: Int
     let planName: String
     let remainingTimeString: String?
+    let providerId: String?
+    let refreshTime: Date?
     var onRefresh: (() -> Void)?
 
     @State private var animatedProgress: Double = 0
+
+    init(
+        progress: Double,
+        usedCount: Int,
+        totalCount: Int,
+        planName: String,
+        remainingTimeString: String?,
+        providerId: String? = nil,
+        refreshTime: Date? = nil,
+        onRefresh: (() -> Void)? = nil
+    ) {
+        self.progress = progress
+        self.usedCount = usedCount
+        self.totalCount = totalCount
+        self.planName = planName
+        self.remainingTimeString = remainingTimeString
+        self.providerId = providerId
+        self.refreshTime = refreshTime
+        self.onRefresh = onRefresh
+    }
 
     private var isPercentageMode: Bool { totalCount == 0 }
 
@@ -65,6 +87,15 @@ struct RingProgressView: View {
                         .foregroundStyle(.tertiary)
                         .accessibilityLabel("剩余 \(timeStr) 后刷新")
                 }
+                if providerId == "minimax", let refreshTime {
+                    Text(refreshTime.formatted(.dateTime
+                        .hour(.twoDigits(amPM: .omitted))
+                        .minute(.twoDigits)
+                        .second(.twoDigits)) + " 刷新")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .accessibilityLabel("将在 \(refreshTime.formatted(.dateTime.hour().minute().second())) 刷新")
+                }
             }
         }
         .padding()
@@ -103,7 +134,9 @@ struct RingProgressView: View {
             usedCount: 25,
             totalCount: 600,
             planName: "MiniMax-M2.7",
-            remainingTimeString: "54:06"
+            remainingTimeString: "54:06",
+            providerId: "minimax",
+            refreshTime: Date().addingTimeInterval(54 * 60 + 6)
         )
     }
 }
@@ -116,7 +149,9 @@ struct RingProgressView: View {
             usedCount: 25,
             totalCount: 600,
             planName: "MiniMax-M2.7",
-            remainingTimeString: "54:06"
+            remainingTimeString: "54:06",
+            providerId: "minimax",
+            refreshTime: Date().addingTimeInterval(54 * 60 + 6)
         )
     }
     .preferredColorScheme(.dark)
