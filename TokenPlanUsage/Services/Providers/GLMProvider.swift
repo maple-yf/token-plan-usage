@@ -12,34 +12,47 @@ class GLMProvider: TokenProvider {
     func fetchUsage(apiKey: String, baseURL: String?) async throws -> UsageSnapshot {
         let base = baseURL ?? defaultBaseURL
 
-        // Fetch model usage (Coding Plan) and the non-Coding Plan account
-        // balance in parallel. The balance call is allowed to fail without
-        // failing the whole snapshot — the Coding Plan view still works.
         async let modelUsageTask = fetchModelUsage(base: base, apiKey: apiKey)
         let balance = await fetchBalanceBestEffort(apiKey: apiKey, baseURL: base)
 
-        let modelUsage = try await modelUsageTask
+        let modelUsage: GLMModelUsageResponse?
+        let modelUsageError: Error?
+        do {
+            modelUsage = try await modelUsageTask
+            modelUsageError = nil
+        } catch {
+            modelUsage = nil
+            modelUsageError = error
+        }
 
-        // Extract data from model usage
-        let totalUsage = modelUsage.data?.totalUsage
+        guard modelUsage != nil || balance != nil else {
+            throw modelUsageError ?? TokenProviderError.invalidResponse
+        }
 
-        // TOKENS_LIMIT and TIME_LIMIT: fetched separately via fetchQuotaLimit (not in fetchUsage)
+        let totalUsage = modelUsage?.data?.totalUsage
+
         let tokensPercentage = 0
         let nextResetTime: Date? = nil
         let mcpQuota: MCPQuota? = nil
 
-        // Build plan name from models
-        let modelNames = totalUsage?.modelSummaryList?.map { $0.modelName ?? "" }.joined(separator: " + ") ?? "GLM"
-
-        // Cache distribution from the same model-usage response (avoid redundant API call)
         let now = Date()
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -1, to: now) ?? now
-        cachedDistribution = buildDistribution(from: modelUsage, windowStart: startDate, windowEnd: now)
+        if let modelUsage {
+            cachedDistribution = buildDistribution(from: modelUsage, windowStart: startDate, windowEnd: now)
+        }
+
+        let planName: String
+        if let modelUsage {
+            let modelNames = totalUsage?.modelSummaryList?.map { $0.modelName ?? "" }.joined(separator: " + ") ?? "GLM"
+            planName = "GLM Coding Plan (\(modelNames))"
+        } else {
+            planName = "GLM"
+        }
 
         return UsageSnapshot(
             providerId: id,
-            planName: "GLM Coding Plan (\(modelNames))",
+            planName: planName,
             usedCount: 0,
             totalCount: 0,
             remainingPercent: Double(100 - tokensPercentage) / 100.0,
@@ -101,6 +114,7 @@ class GLMProvider: TokenProvider {
         }
 
         if resp.code == 401 { throw TokenProviderError.invalidAPIKey }
+        if resp.code == 1000 { throw TokenProviderError.invalidAPIKey }
         guard resp.code == 200 || resp.code == 0 else {
             throw TokenProviderError.serverError(resp.code ?? -1)
         }
@@ -123,12 +137,18 @@ class GLMProvider: TokenProvider {
     }
 
     func fetchDistribution(apiKey: String, baseURL: String?, timeRange: TimeRange = .day) async throws -> UsageDistribution {
-        // Use cached distribution from fetchUsage if available (only matches 24h)
         if timeRange == .day, let cached = cachedDistribution { return cached }
 
-        // Otherwise fetch independently
         let base = baseURL ?? defaultBaseURL
-        let modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey, timeRange: timeRange)
+        let modelUsage: GLMModelUsageResponse
+        do {
+            modelUsage = try await fetchModelUsage(base: base, apiKey: apiKey, timeRange: timeRange)
+        } catch {
+            let now = Date()
+            let calendar = Calendar.current
+            let startDate = calendar.date(byAdding: .day, value: -timeRange.days, to: now) ?? now
+            return UsageDistribution(providerId: id, windowStart: startDate, windowEnd: now, points: [])
+        }
 
         let now = Date()
         let calendar = Calendar.current
@@ -174,6 +194,7 @@ class GLMProvider: TokenProvider {
         }
 
         if resp.code == 401 { throw TokenProviderError.invalidAPIKey }
+        if resp.code == 1000 { throw TokenProviderError.invalidAPIKey }
         guard resp.code == 200 || resp.code == 0 else {
             throw TokenProviderError.serverError(resp.code ?? -1)
         }

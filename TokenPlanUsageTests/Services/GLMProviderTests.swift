@@ -107,6 +107,21 @@ final class GLMProviderTests: XCTestCase {
         XCTAssertEqual(distribution.points.count, 0)
     }
 
+    func testFetchDistributionReturnsEmptyWhenModelUsageFails() async {
+        let json = """
+        {"code": 500, "msg": "当前用户不存在coding plan", "success": false}
+        """
+        mockSuccess(json: json)
+
+        do {
+            let dist = try await provider.fetchDistribution(apiKey: "non-coding-plan", baseURL: nil, timeRange: .day)
+            XCTAssertEqual(dist.providerId, "glm")
+            XCTAssertEqual(dist.points.count, 0)
+        } catch {
+            XCTFail("Should return empty distribution, not throw: \(error)")
+        }
+    }
+
     // MARK: - Error Cases
 
     func testFetchUsageThrowsOnHTTP401() async {
@@ -139,6 +154,42 @@ final class GLMProviderTests: XCTestCase {
             // expected: HTTP 200 but business code 401
         } catch {
             XCTFail("Wrong error: \(error)")
+        }
+    }
+
+    func testFetchUsageMapsAuthFailureCode1000ToInvalidAPIKey() async {
+        let json = """
+        {"code": 1000, "msg": "Authentication Failed", "success": false}
+        """
+        mockSuccess(json: json)
+
+        do {
+            _ = try await provider.fetchUsage(apiKey: "invalid-token", baseURL: nil)
+            XCTFail("Should throw")
+        } catch TokenProviderError.invalidAPIKey {
+            // expected: 智谱用 code 1000 表示认证失败，应映射成 invalidAPIKey
+        } catch {
+            XCTFail("Wrong error: \(error) — 认证失败(code 1000)应映射为 invalidAPIKey")
+        }
+    }
+
+    func testFetchBalanceMapsAuthFailureCode1000ToInvalidAPIKey() async throws {
+        mockPerEndpoint(
+            balanceJSON: """
+            {"code": 1000, "msg": "Authentication Failed", "success": false}
+            """,
+            modelUsageJSON: """
+            {"code": 200, "success": true, "data": {"x_time": [], "tokens_usage": [], "totalUsage": {"totalModelCallCount": 0, "totalTokensUsage": 0}}}
+            """
+        )
+
+        do {
+            _ = try await provider.fetchBalance(apiKey: "invalid", baseURL: nil)
+            XCTFail("Should throw")
+        } catch TokenProviderError.invalidAPIKey {
+            // expected
+        } catch {
+            XCTFail("Wrong error: \(error) — 认证失败(code 1000)应映射为 invalidAPIKey")
         }
     }
 
@@ -376,5 +427,42 @@ final class GLMProviderTests: XCTestCase {
 
         let snapshot = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
         XCTAssertNil(snapshot.glmBalance)
+    }
+
+    // MARK: - Non-Coding-Plan fallback
+
+    func testFetchUsageFallsBackToBalanceOnlyForNonCodingPlanUser() async throws {
+        // 非 Coding Plan 用户：model-usage 返回 code:500 "当前用户不存在coding plan"，
+        // 但 balance 接口正常。fetchUsage 不应抛错，应返回含 balance 的 snapshot。
+        mockPerEndpoint(
+            balanceJSON: """
+            {"code": 200, "data": {"availableBalance": 83.39, "totalSpendAmount": 28.6, "giveAmount": 100.0}}
+            """,
+            modelUsageJSON: """
+            {"code": 500, "msg": "当前用户不存在coding plan", "success": false}
+            """
+        )
+
+        let snapshot = try await provider.fetchUsage(apiKey: "non-coding-plan", baseURL: nil)
+        XCTAssertEqual(snapshot.providerId, "glm")
+        let balance = try XCTUnwrap(snapshot.glmBalance)
+        XCTAssertEqual(balance.balance, 83.39, accuracy: 0.01)
+    }
+
+    func testFetchUsageThrowsWhenBothModelUsageAndBalanceFail() async {
+        // model-usage 失败 + balance 也失败 → fetchUsage 应抛错
+        mockPerEndpoint(
+            balanceJSON: nil,
+            modelUsageJSON: """
+            {"code": 500, "msg": "当前用户不存在coding plan", "success": false}
+            """
+        )
+
+        do {
+            _ = try await provider.fetchUsage(apiKey: "test", baseURL: nil)
+            XCTFail("Should throw when both endpoints fail")
+        } catch {
+            // expected
+        }
     }
 }
